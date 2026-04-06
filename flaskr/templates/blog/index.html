@@ -30,9 +30,9 @@
   <header>
     <div>Actions</div>
   </header>
-  {% for acts in act %}
-    <h1>{{ act['action'] }}</h1>
-    <div> {{ act['description'] }}</div>
+  {% for turn_action in act %}
+    <h1>{{ act['turn_action'] }}</h1>
+    <div> {{ act['turn_description'] }}</div>
 
 
   {% endfor %}

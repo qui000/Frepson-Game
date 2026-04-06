@@ -49,11 +49,11 @@ def create():
 @login_required
 def act():
     if request.method == 'POST':
-        action = request.form['action']
-        description = request.form['description']
+        turn_action = request.form['action']
+        turn_description = request.form['description']
         error = None
 
-        if not action:
+        if not turn_action:
             error = 'Action is required.'
         
 
@@ -62,9 +62,9 @@ def act():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO act (action, description, author_id)'
+                'INSERT INTO act (turn_action, turn_description, author_id)'
                 ' VALUES (?, ?, ?)',
-                (action, description, g.user['id'])
+                (turn_action, turn_description, g.user['id'])
             )
             db.commit()
             return redirect(url_for('blog.index'))
