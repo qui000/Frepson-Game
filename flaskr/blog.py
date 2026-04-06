@@ -28,6 +28,7 @@ def create():
 
         if not title:
             error = 'Title is required.'
+        
 
         if error is not None:
             flash(error)
@@ -42,6 +43,34 @@ def create():
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.html')
+
+
+@bp.route('/act', methods=('GET', 'POST'))
+@login_required
+def act():
+    if request.method == 'POST':
+        action = request.form['action']
+        description = request.form['description']
+        error = None
+
+        if not action:
+            error = 'Action is required.'
+        
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'INSERT INTO act (action, description, author_id)'
+                ' VALUES (?, ?, ?)',
+                (action, description, g.user['id'])
+            )
+            db.commit()
+            return redirect(url_for('blog.index'))
+
+    return render_template('blog/act.html')
+
 
 def get_post(id, check_author=True):
     post = get_db().execute(
