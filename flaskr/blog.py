@@ -16,7 +16,14 @@ def index():
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
-    return render_template('blog/index.html', posts=posts)
+
+    acts = db.execute(
+        'SELECT a.id, turn_action, turn_description, created, author_id, username'
+        ' FROM act a JOIN user u ON a.author_id = u.id'
+        ' ORDER BY created DESC'
+    ).fetchall()
+
+    return render_template('blog/index.html', posts=posts, acts=acts)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
