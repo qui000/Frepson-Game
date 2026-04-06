@@ -49,8 +49,8 @@ def create():
 @login_required
 def act():
     if request.method == 'POST':
-        turn_action = request.form['action']
-        turn_description = request.form['description']
+        turn_action = request.form['turn_action']
+        turn_description = request.form['turn_description']
         error = None
 
         if not turn_action:
