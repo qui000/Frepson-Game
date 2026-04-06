@@ -31,8 +31,8 @@
     <div><strong>Actions</strong></div>
   </header>
   {% for act in acts %}
-    <div><b>{{ act['created'].strftime('%Y-%m-%d') }}: {{ act['username'] }} has {{ act['turn_action'] }}</b></div>
-    <div> {{ act['turn_description'] }}</div>
+    <div class="about"><b>{{ act['created'].strftime('%Y-%m-%d') }}: {{ act['username'] }} has {{ act['turn_action'] }}</b></div>
+    <div class="body"> {{ act['turn_description'] }}</div>
 
 
   {% endfor %}
