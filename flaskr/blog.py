@@ -5,6 +5,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from flaskr.actions import takeAction
 
 bp = Blueprint('blog', __name__)
 
@@ -62,8 +63,11 @@ def act():
 
         if not turn_action:
             error = 'Action is required.'
+        if takeAction(turn_action) is None:
+            error = 'Valid action is required'
+        else:
+            turn_success = takeAction(turn_action)
         
-
         if error is not None:
             flash(error)
         else:
@@ -71,7 +75,7 @@ def act():
             db.execute(
                 'INSERT INTO act (turn_action, turn_description, author_id)'
                 ' VALUES (?, ?, ?)',
-                (turn_action, turn_description, g.user['id'])
+                (turn_success, turn_description, g.user['id'])
             )
             db.commit()
             return redirect(url_for('blog.index'))

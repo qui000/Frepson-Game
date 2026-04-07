@@ -24,10 +24,11 @@ def register():
             error = 'Password is required.'
 
         if error is None:
+
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO user (username, password, location) VALUES (?, ?, ?)",
+                    (username, generate_password_hash(password), 0 ),
                 )
                 db.commit()
             except db.IntegrityError:
