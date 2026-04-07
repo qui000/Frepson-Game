@@ -1,11 +1,13 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS act;
+DROP TABLE IF EXISTS gamestate;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL
+
 );
 
 CREATE TABLE post (
@@ -24,4 +26,8 @@ CREATE TABLE act (
   turn_action TEXT NOT NULL,
   turn_description TEXT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id)
+);
+
+CREATE TABLE gamestate (
+  turn INTEGER NOT NULL
 );
