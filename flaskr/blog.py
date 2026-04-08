@@ -60,13 +60,13 @@ def act():
         turn_action = request.form['turn_action']
         turn_description = request.form['turn_description']
         error = None
+        turn_success = takeAction(turn_action)
 
         if not turn_action:
             error = 'Action is required.'
-        if takeAction(turn_action) is None:
+        if turn_success is None:
             error = 'Valid action is required'
-        else:
-            turn_success = takeAction(turn_action)
+
         
         if error is not None:
             flash(error)
