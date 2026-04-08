@@ -14,8 +14,8 @@ def takeAction(name):
     if name == "move":
         db = get_db()
         db.execute(
-                    "UPDATE user SET location = location + 1 WHERE ID = VALUE (?)",
-                    (g.user['id']),
+                    'UPDATE user SET locale = locale + 1 WHERE id = ?',
+                    (g.user['id'],),
                 )
         db.commit()
         return("moved")
