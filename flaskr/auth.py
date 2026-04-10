@@ -16,6 +16,7 @@ def register():
         username = request.form['username']
         password = request.form['password']
         locale = 0
+        health = 10
         db = get_db()
         error = None
 
@@ -28,8 +29,8 @@ def register():
 
             try:
                 db.execute(
-                    "INSERT INTO user (username, password, locale) VALUES (?, ?, ?)",
-                    (username, generate_password_hash(password), locale ),
+                    "INSERT INTO user (username, password, locale, health) VALUES (?, ?, ?, ?)",
+                    (username, generate_password_hash(password), locale, health ),
                 )
                 db.commit()
             except db.IntegrityError:

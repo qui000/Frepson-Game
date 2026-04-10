@@ -1,14 +1,26 @@
 {% extends 'base.html' %}
 
+
 {% block header %}
   <h1>{% block title %}The Board{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{ url_for('blog.create') }}">Announce</a>
     <a class = "action" href="{{ url_for('blog.act') }}">Act</a>
   {% endif %}
+
+
 {% endblock %}
 
+
+
 {% block content %}
+  <h2>Your Character</h2>
+  {% if g.user %}
+    
+    <div>Health: {{ g.user['health'] }} Locale: {{ g.user['locale'] }}</div>
+    <br>
+
+  {% endif %}
   {% for post in posts %}
     <article class="post">
       <header>

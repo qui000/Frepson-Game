@@ -5,7 +5,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
-from flaskr.actions import takeAction
+from flaskr.actions import takeAction, giveAllActions
 
 bp = Blueprint('blog', __name__)
 
@@ -24,7 +24,9 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
 
-    return render_template('blog/index.html', posts=posts, acts=acts)
+
+
+    return render_template('blog/index.html', posts=posts, acts=acts, allActions=giveAllActions())
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
