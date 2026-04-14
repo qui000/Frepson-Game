@@ -33,6 +33,16 @@ def init_db():
 def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
+
+    startTurn = 1
+    db = get_db()
+    db.execute(
+        'INSERT INTO gamestate (turn) VALUES (?)',
+        (startTurn,),
+
+    )
+    db.commit()
+
     click.echo('Initialized the database.')
 
 

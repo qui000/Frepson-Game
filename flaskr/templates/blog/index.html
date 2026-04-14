@@ -14,13 +14,7 @@
 
 
 {% block content %}
-  <h2>Your Character</h2>
-  {% if g.user %}
-    
-    <div>Health: {{ g.user['health'] }} Locale: {{ g.user['locale'] }}</div>
-    <br>
 
-  {% endif %}
   {% for post in posts %}
     <article class="post">
       <header>

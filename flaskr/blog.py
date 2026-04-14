@@ -5,7 +5,8 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
-from flaskr.actions import takeAction, giveAllActions
+from flaskr.actions import takeAction, checkCurrentUser
+from flaskr.turns import giveActionPoints, checkTurn
 
 bp = Blueprint('blog', __name__)
 
@@ -23,10 +24,17 @@ def index():
         ' FROM act a JOIN user u ON a.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
+    aps = None
+    if g.user: 
+        if (checkCurrentUser('action_points') == 0) and checkTurn() == int(g.user['id']):
+            giveActionPoints(g.user['username'], 5)
+            
 
 
 
-    return render_template('blog/index.html', posts=posts, acts=acts, allActions=giveAllActions())
+
+
+    return render_template('blog/index.html', posts=posts, acts=acts)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -58,28 +66,38 @@ def create():
 @bp.route('/act', methods=('GET', 'POST'))
 @login_required
 def act():
+
+
+
+        
+
     if request.method == 'POST':
         turn_action = request.form['turn_action']
         turn_description = request.form['turn_description']
         error = None
-        turn_success = takeAction(turn_action)
-
+        
+        
         if not turn_action:
             error = 'Action is required.'
-        if turn_success is None:
-            error = 'Valid action is required'
 
-        
         if error is not None:
             flash(error)
         else:
+
+            action_message = takeAction(turn_action)
+
+            if action_message == 'It is not your turn.':
+                flash('It is not your turn.')
+                return redirect(url_for('blog.index'))
+            
             db = get_db()
             db.execute(
                 'INSERT INTO act (turn_action, turn_description, author_id)'
                 ' VALUES (?, ?, ?)',
-                (turn_success, turn_description, g.user['id'])
+                (action_message, turn_description, g.user['id'])
             )
             db.commit()
+            
             return redirect(url_for('blog.index'))
 
     return render_template('blog/act.html')

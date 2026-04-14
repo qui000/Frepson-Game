@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block content %}
+  <h2>Your Character</h2>
+  {% if g.user %}
+    
+    <div>Health: {{ g.user['health'] }} Locale: {{ g.user['locale'] }} Action Points: {{ g.user['action_points'] }}</div>
+    <br>
+
+  {% endif %}
   <form method="post">
     <label for="turn_action">Action</label>
     <input name="turn_action" id="turn_action" value="{{ request.form['turn_action'] }}" required>

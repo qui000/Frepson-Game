@@ -6,6 +6,9 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import get_db
+from flaskr.turns import checkTurn, giveActionPoints
+from flaskr.actions import checkCurrentUser
+
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -15,8 +18,6 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        locale = 0
-        health = 10
         db = get_db()
         error = None
 
@@ -29,13 +30,17 @@ def register():
 
             try:
                 db.execute(
-                    "INSERT INTO user (username, password, locale, health) VALUES (?, ?, ?, ?)",
-                    (username, generate_password_hash(password), locale, health ),
+                    "INSERT INTO user (username, password) VALUES (?, ?)",
+                    (username, generate_password_hash(password)),
                 )
                 db.commit()
+                
+                    
+
             except db.IntegrityError:
                 error = f"User {username} is already registered."
             else:
+                
                 return redirect(url_for('auth.login'))
 
         flash(error)
@@ -74,9 +79,23 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
+        
         g.user = get_db().execute(
             'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
+
+        g.gamestate = get_db().execute(
+            'SELECT * FROM gamestate'
+        ).fetchone()
+
+        g.highestID = get_db().execute(
+                'SELECT MAX(id) AS id FROM user',
+                
+            ).fetchone()
+        
+        
+    
+        
 
 
 @bp.route('/logout')
