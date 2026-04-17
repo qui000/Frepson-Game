@@ -36,6 +36,14 @@ def changeTurn():
             
         )
         db.commit()
+
+        db = get_db()
+
+        db.execute(
+            'UPDATE gamestate SET gameloops = gameloops + 1'
+            
+        )
+        db.commit()
         return
     
     db = get_db()

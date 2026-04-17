@@ -89,7 +89,12 @@ def load_logged_in_user():
         ).fetchone()
 
         g.highestID = get_db().execute(
-                'SELECT MAX(id) AS id FROM user',
+            'SELECT MAX(id) AS id FROM user',
+                
+            ).fetchone()
+        
+        g.location = get_db().execute(
+            'SELECT * FROM location WHERE posX = ? AND posY = ?', (g.user['posX'], g.user['posY'])
                 
             ).fetchone()
         

@@ -3,6 +3,7 @@ from datetime import datetime
 
 import click
 from flask import current_app, g
+from flaskr.locale import giveLocations
 
 
 def get_db():
@@ -28,6 +29,20 @@ def init_db():
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
+def createLocations():
+
+    for q in giveLocations():
+        db = get_db()
+        db.execute(
+            'INSERT INTO location (full_name, posX, posY, ground, npc, enemy) VALUES (?, ?, ?, ?, ?, ?)',
+            (q.full_name, q.posX, q.posY, q.ground, q.npc, q.enemy),
+
+        )
+        db.commit()
+    return
+
+    
+
 
 @click.command('init-db')
 def init_db_command():
@@ -42,6 +57,13 @@ def init_db_command():
 
     )
     db.commit()
+
+    createLocations()
+
+    
+
+    
+
 
     click.echo('Initialized the database.')
 
