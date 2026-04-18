@@ -17,9 +17,9 @@ class item:
 
 knife = item('knife', 8, 'stab')
 needle = item('needle', 1, 'stick')
-smoothRock = item('smooth rock', 10, 'throw')
+rock = item('rock', 10, 'throw')
 
-all_items = [knife, needle, smoothRock]
+all_items = [knife, needle, rock]
 
 def giveItems():
    
