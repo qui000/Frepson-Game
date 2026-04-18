@@ -4,14 +4,36 @@ from flask import (
 
 from flaskr.db import get_db
 from flaskr.turns import giveActionPoints, changeTurn, checkTurn
+
 import click
 
 gridSize = 2
 
 def giveAllActions():
-    all_actions = ["move","punch"]
+    base_actions = ["move","punch","take"]
+    
+    for q in [g.user['slot1'],g.user['slot2'],g.user['slot3']]:
+        if q != 0:
 
+            name = get_db().execute(
+            'SELECT action FROM item WHERE id = ?', (q,)
+            ).fetchone()[0]
+
+            base_actions.append(name)
+            click.echo(base_actions)
+
+    
+
+    all_actions = base_actions
+    click.echo(all_actions)
     return all_actions
+
+def canAction(action):
+
+    for q in giveAllActions():
+        if q == action:
+            return True
+    return False
 
 
 def checkCurrentUser(for_what):
@@ -33,7 +55,7 @@ def sameCurrentLocation(username):
 
 
 def takeAction(full_name):
-
+    
     message = None
     name = full_name.split()
     action = name[0].lower()
@@ -44,6 +66,8 @@ def takeAction(full_name):
 
     if (int(checkCurrentUser('action_points')) < 1) or checkTurn() != int(g.user['id']):
         return 'It is not your turn.'
+    if canAction(action) == False:
+        return 'You cannot do that.'
     if int(checkCurrentUser('action_points')) == 1:
         last_turn = True
         
@@ -90,17 +114,39 @@ def takeAction(full_name):
             
             
 
-
-
-    
     if action == "punch":
+        
         message = ("realized there is no person named "+object+" here to punch. He punched the air in vain.")
         if sameCurrentLocation(object) != None:
             message = ("punched "+object)
             changeHealth(object, -1)
             giveActionPoints(currentUsername,-1)
-            
+
+    if action == "stab":
+        message = ("realized there is no person named "+object+" here to stab. He stabbed at the whistling air in vain.")
+        if sameCurrentLocation(object) != None:
+            message = ("stabbed "+object)
+            changeHealth(object, -2)
+            giveActionPoints(currentUsername,-1)
+
+
+    if action == "take":
+        message = "grabbed for the untakeable."
+        pullName = get_db().execute(
+            'SELECT full_name FROM item WHERE id = ?', (g.location['ground'],)
+            ).fetchone()
         
+        if pullName:
+            pullName = pullName[0]
+        if pullName == object:
+            message = "couldn't find room in his pockets for the "+object
+            if intoEmptySlot(currentUsername,g.location['ground']) == True:
+                giveActionPoints(currentUsername, -1)
+                removeItemFromLocale(g.location['id'])
+                message = 'picked up the '+object
+
+
+
     if (message != None):
 
         if last_turn == True:
@@ -152,3 +198,51 @@ def checkLocaleMove(amount,direction):
 
     return False
 
+def removeItemFromLocale(where):
+        db = get_db()
+        db.execute(
+                    'UPDATE location SET ground = 0 WHERE id = ?',
+                    (where,),
+                )
+        db.commit()
+
+def intoEmptySlot(who,what):
+
+
+    try1 = get_db().execute(
+            'SELECT slot1 FROM user WHERE username = ?', (who,)
+            ).fetchone()
+    if try1 != 0:
+        db = get_db()
+        db.execute(
+                    'UPDATE user SET slot1 = ? WHERE username = ?',
+                    (what,who),
+                )
+        db.commit()
+        return True
+
+    try2 = get_db().execute(
+            'SELECT slot2 FROM user WHERE username = ?', (who,)
+            ).fetchone()
+    if try2 != 0:
+        db = get_db()
+        db.execute(
+                    'UPDATE user SET slot2 = ? WHERE username = ?',
+                    (what,who),
+                )
+        db.commit()
+        return True
+
+    try3 = get_db().execute(
+            'SELECT slot3 FROM user WHERE username = ?', (who,)
+            ).fetchone()
+    if try3 != 0:
+        db = get_db()
+        db.execute(
+                    'UPDATE user SET slot3 = ? WHERE username = ?',
+                    (what,who),
+                )
+        db.commit()
+        return True
+
+    return False

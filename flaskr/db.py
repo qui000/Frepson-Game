@@ -4,6 +4,7 @@ from datetime import datetime
 import click
 from flask import current_app, g
 from flaskr.locale import giveLocations
+from flaskr.items import giveItems
 
 
 def get_db():
@@ -41,6 +42,18 @@ def createLocations():
         db.commit()
     return
 
+def createItems():
+
+    for q in giveItems():
+        db = get_db()
+        db.execute(
+            'INSERT INTO item (full_name, health, action) VALUES (?, ?, ?)',
+            (q.full_name, q.health, q.action),
+
+        )
+        db.commit()
+    return
+
     
 
 
@@ -59,6 +72,7 @@ def init_db_command():
     db.commit()
 
     createLocations()
+    createItems()
 
     
 

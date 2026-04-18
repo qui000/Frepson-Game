@@ -8,8 +8,13 @@
   <h2>Your Character</h2>
   {% if g.user %}
     
-    <div>Health: {{ g.user['health'] }} Locale: {{ g.location['full_name'] }} Action Points: {{ g.user['action_points'] }}</div>
+    <div>Health: {{ g.user['health'] }}<br>Action Points: {{ g.user['action_points'] }}</div>
     <br>
+    <h2>Current Location</h2>
+    <div>You like to call this spot the: {{ g.location['full_name'] }}.</div>
+    {% if g.groundObject %}
+        <div>You see a {{ g.groundObject['full_name'] }} on the ground.</div>
+    {% endif %}
 
   {% endif %}
   <form method="post">

@@ -97,6 +97,10 @@ def load_logged_in_user():
                 'SELECT * FROM location WHERE posX = ? AND posY = ?', (g.user['posX'], g.user['posY'])
                     
                 ).fetchone()
+            
+            g.groundObject = get_db().execute(
+                'SELECT * FROM item WHERE id = ?', (g.location['ground'],)
+                ).fetchone()
 
         
         

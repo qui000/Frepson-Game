@@ -16,10 +16,10 @@ class place:
     self.npc = npc
     self.enemy = enemy
 
-startingHole = place('Starting Hole', 0, 0, 'knife')
-brook = place('The Brook', 1, 0, 'smooth rock')
+startingHole = place('Starting Hole', 0, 0, 1)
+brook = place('The Brook', 1, 0, 3)
 puddle = place('The Puddle Library', 0, 1,)
-haystack = place('The Musty Haystack', 1, 1, 'needle')
+haystack = place('The Musty Haystack', 1, 1, 2)
 
 all_locations = {startingHole, brook, puddle, haystack}
 

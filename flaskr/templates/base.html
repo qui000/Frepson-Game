@@ -1,8 +1,8 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} - A Game</title>
+<title>{% block title %}{% endblock %} - DinoSpore</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>A Game</h1>
+  <h1>DinoSpore</h1>
   <ul>
     {% if g.user %}
       <li><span>{{ g.user['username'] }}</span>

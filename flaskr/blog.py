@@ -93,8 +93,8 @@ def act():
 
             action_message = takeAction(turn_action)
 
-            if action_message == 'It is not your turn.':
-                flash('It is not your turn.')
+            if action_message == ('It is not your turn.') or action_message == ('You cannot do that.'):
+                flash(action_message)
                 return redirect(url_for('blog.index'))
             
             db = get_db()
