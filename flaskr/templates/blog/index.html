@@ -32,7 +32,20 @@
       <hr>
     {% endif %}
   {% endfor %}
-
+  
+  {% if g.user %}
+  <h4><u>Players</u></h4>
+    {% for user in users%}
+      {% if g.gamestate['turn'] == user['id']%}
+        <div><b><u>{{ user['username'] }}: {{ user['id'] }}</u></b></div>
+      {% else %}
+        <div>{{ user['username'] }}: {{ user['id'] }}</div>
+      {% endif %}
+    
+    {% endfor%}
+    
+  {% endif %}
+  <br>
   <header>
     <div><strong>Actions</strong></div>
   </header>

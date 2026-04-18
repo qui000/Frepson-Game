@@ -24,6 +24,12 @@ def index():
         ' FROM act a JOIN user u ON a.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
+
+    users = db.execute(
+        'SELECT id, username'
+        ' FROM user'
+        ' ORDER BY id ASC'
+    ).fetchall()
     aps = None
     if g.user: 
         if (checkCurrentUser('action_points') == 0) and checkTurn() == int(g.user['id']):
@@ -35,7 +41,7 @@ def index():
 
 
 
-    return render_template('blog/index.html', posts=posts, acts=acts)
+    return render_template('blog/index.html', posts=posts, acts=acts, users=users)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
