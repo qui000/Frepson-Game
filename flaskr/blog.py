@@ -5,7 +5,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
-from flaskr.actions import takeAction, checkCurrentUser
+from flaskr.actions import takeAction, checkCurrentUser, giveAllActions
 from flaskr.turns import giveActionPoints, checkTurn
 
 bp = Blueprint('blog', __name__)
@@ -30,10 +30,12 @@ def index():
         ' FROM user'
         ' ORDER BY id ASC'
     ).fetchall()
-    aps = None
+
     if g.user: 
+        
         if (checkCurrentUser('action_points') == 0) and checkTurn() == int(g.user['id']):
             giveActionPoints(g.user['username'], 5)
+        
 
             
 
@@ -107,7 +109,7 @@ def act():
             
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/act.html')
+    return render_template('blog/act.html',allActs = giveAllActions())
 
 
 def get_post(id, check_author=True):

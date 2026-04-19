@@ -5,23 +5,30 @@
 {% endblock %}
 
 {% block content %}
-  <h2>Your Character</h2>
-  {% if g.user %}
+    <h2>Your Character</h2>
+    {% if g.user %}
     
-    <div>Health: {{ g.user['health'] }}<br>Action Points: {{ g.user['action_points'] }}</div>
-    <br>
-    <h2>Current Location</h2>
-    <div>You like to call this spot the: {{ g.location['full_name'] }}.</div>
-    {% if g.groundObject %}
-        <div>You see a {{ g.groundObject['full_name'] }} on the ground.</div>
-    {% endif %}
+        <div>Health: {{ g.user['health'] }}<br>Action Points: {{ g.user['action_points'] }}</div>
+        <div><b>Actions:</b>
+        {% for act in allActs %}
+            {{ act }}, 
+            
 
-  {% endif %}
-  <form method="post">
-    <label for="turn_action">Action</label>
-    <input name="turn_action" id="turn_action" value="{{ request.form['turn_action'] }}" required>
-    <label for="turn_description">Description</label>
-    <textarea name="turn_description" id="turn_description">{{ request.form['turn_description'] }}</textarea>
-    <input type="submit" value="Save">
-  </form>
+        {% endfor %}
+        </div>
+        <br>
+        <h2>Current Location</h2>
+        <div>You like to call this spot the: {{ g.location['full_name'] }}.</div>
+        {% if g.groundObject %}
+            <div>You see a {{ g.groundObject['full_name'] }} on the ground.</div>
+        {% endif %}
+
+    {% endif %}
+    <form method="post">
+        <label for="turn_action">Action</label>
+        <input name="turn_action" id="turn_action" value="{{ request.form['turn_action'] }}" required>
+        <label for="turn_description">Description</label>
+        <textarea name="turn_description" id="turn_description">{{ request.form['turn_description'] }}</textarea>
+        <input type="submit" value="Save">
+    </form>
 {% endblock %}
