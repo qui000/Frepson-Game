@@ -8,10 +8,11 @@ import click
 
 
 class item:
-  def __init__(self, full_name, health, action):
+  def __init__(self, full_name, health, action,armorType="None"):
     self.full_name = full_name
     self.health = health
     self.action = action
+    self.armorType = armorType
 
  
 

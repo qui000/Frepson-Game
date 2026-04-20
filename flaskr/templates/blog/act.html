@@ -9,6 +9,18 @@
     {% if g.user %}
     
         <div>Health: {{ g.user['health'] }}<br>Action Points: {{ g.user['action_points'] }}</div>
+        <div>Inventory:
+            {% for q in [g.slot1, g.slot2, g.slot3] %}
+                {% if q['id'] != 0 %}
+                    {{ q['full_name']}}
+                {% endif %}
+            {% endfor %}
+
+
+
+
+
+        </div>
         <div><b>Actions:</b>
         {% for act in allActs %}
             {{ act }}, 

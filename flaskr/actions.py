@@ -10,7 +10,7 @@ import click
 gridSize = 2
 
 def giveAllActions():
-    base_actions = ["move","punch","take"]
+    base_actions = ["move","punch","take","drop"]
     
     for q in [g.user['slot1'],g.user['slot2'],g.user['slot3']]:
         if q != 0:
@@ -20,7 +20,7 @@ def giveAllActions():
             ).fetchone()[0]
 
             base_actions.append(name)
-            click.echo(base_actions)
+            
 
     
 
@@ -142,8 +142,22 @@ def takeAction(full_name):
             message = "couldn't find room in his pockets for the "+object
             if intoEmptySlot(currentUsername,g.location['ground']) == True:
                 giveActionPoints(currentUsername, -1)
-                removeItemFromLocale(g.location['id'])
+                itemGround(g.location['id'],0)
                 message = 'picked up the '+object
+                
+    if action == "drop":
+        message = "thought he could drop something he didn't even have."
+        have = itemOnCurrentUser(object)
+
+        if have != 'None':
+            
+            giveActionPoints(currentUsername,-1)
+            if g.location['ground'] == 0:
+                itemGround(g.location['id'],have['id'])
+                message = "dropped the "+object
+            else:
+                message = "dropped the "+object+" and it broke beyond repair."
+            removeItem(object,currentUsername)
 
 
 
@@ -198,15 +212,16 @@ def checkLocaleMove(amount,direction):
 
     return False
 
-def removeItemFromLocale(where):
+def itemGround(where,what):
         db = get_db()
         db.execute(
-                    'UPDATE location SET ground = 0 WHERE id = ?',
-                    (where,),
+                    'UPDATE location SET ground = ? WHERE id = ?',
+                    (what,where),
                 )
         db.commit()
 
 def intoEmptySlot(who,what):
+
 
 
     try1 = get_db().execute(
@@ -246,3 +261,46 @@ def intoEmptySlot(who,what):
         return True
 
     return False
+
+def itemOnCurrentUser(itemName):
+    if g.slot1 != 0 and itemName == g.slot1['full_name']:
+        return g.slot1
+    if itemName == g.slot2['full_name']:
+        return g.slot2
+    if itemName == g.slot3['full_name']:
+        return g.slot3
+
+
+
+    return 'None'
+
+def removeItem(itemName,who):
+    
+    if itemName == g.slot1['full_name']:
+        db = get_db()
+        db.execute(
+                'UPDATE user SET slot1 = 0 WHERE username = ?',
+                (who,),
+            )
+        db.commit()
+        return 
+
+    if itemName == g.slot2['full_name']:
+        db = get_db()
+        db.execute(
+                'UPDATE user SET slot2 = 0 WHERE username = ?',
+                (who,),
+            )
+        db.commit()
+        return
+
+    if itemName == g.slot3['full_name']:
+        db = get_db()
+        db.execute(
+                'UPDATE user SET slot3 = 0 WHERE username = ?',
+                (who,),
+            )
+        db.commit()
+        return
+
+    return 'None'

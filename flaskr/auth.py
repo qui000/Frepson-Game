@@ -101,6 +101,21 @@ def load_logged_in_user():
             g.groundObject = get_db().execute(
                 'SELECT * FROM item WHERE id = ?', (g.location['ground'],)
                 ).fetchone()
+            
+
+            g.slot1= get_db().execute(
+                'SELECT * FROM item WHERE id = ?', (g.user['slot1'],)
+                ).fetchone()
+            
+            g.slot2= get_db().execute(
+                'SELECT * FROM item WHERE id = ?', (g.user['slot2'],)
+                ).fetchone()
+            
+            g.slot3= get_db().execute(
+                'SELECT * FROM item WHERE id = ?', (g.user['slot3'],)
+                ).fetchone()
+            
+
 
         
         
