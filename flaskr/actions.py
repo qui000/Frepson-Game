@@ -263,11 +263,11 @@ def intoEmptySlot(who,what):
     return False
 
 def itemOnCurrentUser(itemName):
-    if g.slot1 != 0 and itemName == g.slot1['full_name']:
+    if g.slot1 and itemName == g.slot1['full_name']:
         return g.slot1
-    if itemName == g.slot2['full_name']:
+    if g.slot2 and itemName == g.slot2['full_name']:
         return g.slot2
-    if itemName == g.slot3['full_name']:
+    if g.slot3 and itemName == g.slot3['full_name']:
         return g.slot3
 
 
