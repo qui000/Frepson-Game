@@ -12,11 +12,12 @@ gridSize = 2
 def giveAllActions():
     base_actions = ["move","punch","take","drop"]
     
-    for q in [g.user['slot1'],g.user['slot2'],g.user['slot3']]:
-        if q != 0:
+    if g.inventory:
 
+        for q in g.inventory:
+            
             name = get_db().execute(
-            'SELECT action FROM item WHERE id = ?', (q,)
+            'SELECT action FROM item WHERE id = ?', (q['id'],)
             ).fetchone()[0]
 
             base_actions.append(name)
@@ -131,33 +132,32 @@ def takeAction(full_name):
 
 
     if action == "take":
-        message = "grabbed for the untakeable."
-        pullName = get_db().execute(
-            'SELECT full_name FROM item WHERE id = ?', (g.location['ground'],)
-            ).fetchone()
+        message = "thought he could take the "+object
+        item = getItemPlace(object)
         
-        if pullName:
-            pullName = pullName[0]
-        if pullName == object:
-            message = "couldn't find room in his pockets for the "+object
-            if intoEmptySlot(currentUsername,g.location['ground']) == True:
-                giveActionPoints(currentUsername, -1)
-                itemGround(g.location['id'],0)
-                message = 'picked up the '+object
-                
-    if action == "drop":
-        message = "thought he could drop something he didn't even have."
-        have = itemOnCurrentUser(object)
-
-        if have != 'None':
+        if (str(item[0]) == str(g.location['id'])) and (item[1] == 1):
+            message = "didn't have room on his person for the "+object
             
+            if g.user['room'] > len(g.inventory):
+                message = "picked up the "+object
+                putItem(object, 'user', g.user['id'])
+                giveActionPoints(currentUsername,-1)
+
+    if action == "drop":
+        message = "thought he could drop the "+object
+        item = getItemPlace(object)
+        
+        if (str(item[0]) == str(g.user['id'])) and (item[1] == 0):
+            message = "dropped the "+object
+            click.echo(str(object) + 'location' + str(g.location['id']))
+            putItem(object, 'location', g.location['id'])
             giveActionPoints(currentUsername,-1)
-            if g.location['ground'] == 0:
-                itemGround(g.location['id'],have['id'])
-                message = "dropped the "+object
-            else:
-                message = "dropped the "+object+" and it broke beyond repair."
-            removeItem(object,currentUsername)
+
+
+
+
+
+
 
 
 
@@ -212,95 +212,30 @@ def checkLocaleMove(amount,direction):
 
     return False
 
-def itemGround(where,what):
-        db = get_db()
-        db.execute(
-                    'UPDATE location SET ground = ? WHERE id = ?',
-                    (what,where),
-                )
-        db.commit()
+def getItemPlace(itemName):
 
-def intoEmptySlot(who,what):
-
-
-
-    try1 = get_db().execute(
-            'SELECT slot1 FROM user WHERE username = ?', (who,)
+    theItem = get_db().execute(
+            'SELECT * FROM item WHERE full_name = ?', (itemName,)
             ).fetchone()
-    if try1 != 0:
-        db = get_db()
-        db.execute(
-                    'UPDATE user SET slot1 = ? WHERE username = ?',
-                    (what,who),
-                )
-        db.commit()
-        return True
+    
+    return [theItem['ownerID'],theItem['onGround']]
 
-    try2 = get_db().execute(
-            'SELECT slot2 FROM user WHERE username = ?', (who,)
+def putItem(itemName, ownerType, ownerID):
+
+    theItem = get_db().execute(
+            'SELECT * FROM item WHERE full_name = ?', (itemName,)
             ).fetchone()
-    if try2 != 0:
-        db = get_db()
-        db.execute(
-                    'UPDATE user SET slot2 = ? WHERE username = ?',
-                    (what,who),
-                )
-        db.commit()
-        return True
+    value = 0
+    if ownerType == 'location':
+        value = 1
 
-    try3 = get_db().execute(
-            'SELECT slot3 FROM user WHERE username = ?', (who,)
-            ).fetchone()
-    if try3 != 0:
-        db = get_db()
-        db.execute(
-                    'UPDATE user SET slot3 = ? WHERE username = ?',
-                    (what,who),
-                )
-        db.commit()
-        return True
-
+    
+    db = get_db()
+    db.execute(
+        'UPDATE item SET ownerID = ?, onGround = ? WHERE id = ?', (ownerID, value, theItem['id']),
+        )
+    db.commit()
     return False
 
-def itemOnCurrentUser(itemName):
-    if g.slot1 and itemName == g.slot1['full_name']:
-        return g.slot1
-    if g.slot2 and itemName == g.slot2['full_name']:
-        return g.slot2
-    if g.slot3 and itemName == g.slot3['full_name']:
-        return g.slot3
 
 
-
-    return 'None'
-
-def removeItem(itemName,who):
-    
-    if itemName == g.slot1['full_name']:
-        db = get_db()
-        db.execute(
-                'UPDATE user SET slot1 = 0 WHERE username = ?',
-                (who,),
-            )
-        db.commit()
-        return 
-
-    if itemName == g.slot2['full_name']:
-        db = get_db()
-        db.execute(
-                'UPDATE user SET slot2 = 0 WHERE username = ?',
-                (who,),
-            )
-        db.commit()
-        return
-
-    if itemName == g.slot3['full_name']:
-        db = get_db()
-        db.execute(
-                'UPDATE user SET slot3 = 0 WHERE username = ?',
-                (who,),
-            )
-        db.commit()
-        return
-
-    return 'None'

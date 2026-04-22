@@ -31,10 +31,12 @@ def index():
         ' ORDER BY id ASC'
     ).fetchall()
 
+
     if g.user: 
         
         if (checkCurrentUser('action_points') == 0) and checkTurn() == int(g.user['id']):
             giveActionPoints(g.user['username'], 5)
+        
         
 
             

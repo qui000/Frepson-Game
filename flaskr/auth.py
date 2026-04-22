@@ -98,22 +98,27 @@ def load_logged_in_user():
                     
                 ).fetchone()
             
-            g.groundObject = get_db().execute(
-                'SELECT * FROM item WHERE id = ?', (g.location['ground'],)
-                ).fetchone()
+            g.inventory = []
+            getter = get_db().execute(
+                'SELECT * FROM item WHERE ownerID = ? AND onGround = 0', (g.user['id'],)
+                    
+                ).fetchall()
+            
+            for q in getter:
+                g.inventory.append(q)
+
+            g.ground = []
+            snagger = get_db().execute(
+                'SELECT * FROM item WHERE ownerID = ? AND onGround = 1', (g.location['id'],)
+                    
+                ).fetchall()
+            
+            for q in snagger:
+                g.ground.append(q)
             
 
-            g.slot1= get_db().execute(
-                'SELECT * FROM item WHERE id = ?', (g.user['slot1'],)
-                ).fetchone()
             
-            g.slot2= get_db().execute(
-                'SELECT * FROM item WHERE id = ?', (g.user['slot2'],)
-                ).fetchone()
-            
-            g.slot3= get_db().execute(
-                'SELECT * FROM item WHERE id = ?', (g.user['slot3'],)
-                ).fetchone()
+
             
 
 

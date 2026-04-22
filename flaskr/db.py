@@ -35,8 +35,8 @@ def createLocations():
     for q in giveLocations():
         db = get_db()
         db.execute(
-            'INSERT INTO location (full_name, posX, posY, ground, npc, enemy) VALUES (?, ?, ?, ?, ?, ?)',
-            (q.full_name, q.posX, q.posY, q.ground, q.npc, q.enemy),
+            'INSERT INTO location (full_name, posX, posY) VALUES (?, ?, ?)',
+            (q.full_name, q.posX, q.posY),
 
         )
         db.commit()
@@ -47,8 +47,8 @@ def createItems():
     for q in giveItems():
         db = get_db()
         db.execute(
-            'INSERT INTO item (full_name, health, action) VALUES (?, ?, ?)',
-            (q.full_name, q.health, q.action),
+            'INSERT INTO item (full_name, health, action, ownerID) VALUES (?, ?, ?, ?)',
+            (q.full_name, q.health, q.action, q.ownerID),
 
         )
         db.commit()
