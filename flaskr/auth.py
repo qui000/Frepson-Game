@@ -115,6 +115,16 @@ def load_logged_in_user():
             
             for q in snagger:
                 g.ground.append(q)
+
+            g.neighbors = []
+            grabber = get_db().execute(
+                'SELECT * FROM user WHERE posX = ? AND posY = ?', (g.user['posX'], g.user['posY'])
+                    
+                ).fetchall()
+            
+            for q in grabber:
+                if q != g.user:
+                    g.neighbors.append(q)
             
 
             

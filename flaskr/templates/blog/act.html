@@ -42,6 +42,18 @@
                 
             </div>
         {% endif %}
+        
+        {% if g.neighbors %}
+            <div>You also see 
+                    {% for q in g.neighbors %}
+                        {{ q['username'] }}, 
+                    {% endfor %}
+                    standing a little too close.
+                
+                
+                
+            </div>
+        {% endif %}
 
     {% endif %}
     <form method="post">
