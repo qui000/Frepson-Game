@@ -132,7 +132,7 @@ def takeAction(full_name):
 
 
     if action == "take":
-        message = "thought he could take the "+object
+        message = "thought he could take the uh thing"
         item = getItemPlace(object)
         
         if (str(item[0]) == str(g.location['id'])) and (item[1] == 1):
