@@ -5,7 +5,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
-from flaskr.actions import takeAction, checkCurrentUser, giveAllActions
+from flaskr.actions import takeAction, giveAllActions
 from flaskr.turns import giveActionPoints, checkTurn
 
 bp = Blueprint('blog', __name__)
@@ -34,7 +34,7 @@ def index():
 
     if g.user: 
         
-        if (checkCurrentUser('action_points') == 0) and checkTurn() == int(g.user['id']):
+        if (g.user['action_points'] == 0) and checkTurn() == int(g.user['id']):
             giveActionPoints(g.user['username'], 5)
         
         
@@ -95,7 +95,7 @@ def act():
             flash(error)
         else:
 
-            action_message = takeAction(turn_action)
+            action_message = takeAction(turn_action, g.user)
 
             if action_message == ('It is not your turn.') or action_message == ('You cannot do that.'):
                 flash(action_message)
@@ -111,7 +111,7 @@ def act():
             
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/act.html',allActs = giveAllActions())
+    return render_template('blog/act.html',allActs = giveAllActions(g.user))
 
 
 def get_post(id, check_author=True):

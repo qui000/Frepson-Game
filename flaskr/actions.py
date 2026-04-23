@@ -9,12 +9,12 @@ import click
 
 gridSize = 2
 
-def giveAllActions():
+def giveAllActions(who):
     base_actions = ["move","punch","take","drop"]
     
-    if g.inventory:
+    if getInventory(who):
 
-        for q in g.inventory:
+        for q in getInventory(who):
             
             name = get_db().execute(
             'SELECT action FROM item WHERE id = ?', (q['id'],)
@@ -29,47 +29,44 @@ def giveAllActions():
     click.echo(all_actions)
     return all_actions
 
-def canAction(action):
+def canAction(action,who):
 
-    for q in giveAllActions():
+    for q in giveAllActions(who):
         if q == action:
             return True
     return False
 
 
-def checkCurrentUser(for_what):
-
-    user_detail = g.user[for_what]
-    
-    
-    return user_detail
-
-def sameCurrentLocation(username):
+def sameCurrentLocation(username,username2):
 
     user_detail = get_db().execute(
-            'SELECT id FROM user WHERE posX = ? AND posY = ? AND username = ?', (g.location['posX'], g.location['posY'], username,)
+            'SELECT * FROM user WHERE username = ?', (username,)
+            ).fetchone()
+
+    user_detail2 = get_db().execute(
+            'SELECT id FROM user WHERE posX = ? AND posY = ? AND username = ?', (user_detail['posX'], user_detail['posY'], username2,)
             ).fetchone()
     
-    click.echo(user_detail)
+    click.echo(user_detail2)
     return user_detail
 
 
 
-def takeAction(full_name):
+def takeAction(full_name,whom):
     
     message = None
     name = full_name.split()
     action = name[0].lower()
     last_turn = False
-    currentUsername = g.user['username']
+    currentUsername = whom['username']
     if len(name) > 1:
         object = name[1]
 
-    if (int(checkCurrentUser('action_points')) < 1) or checkTurn() != int(g.user['id']):
+    if (int(whom['action_points']) < 1) or checkTurn() != int(whom['id']):
         return 'It is not your turn.'
-    if canAction(action) == False:
+    if canAction(action,whom) == False:
         return 'You cannot do that.'
-    if int(checkCurrentUser('action_points')) == 1:
+    if int(whom['action_points']) == 1:
         last_turn = True
         
 
@@ -81,7 +78,7 @@ def takeAction(full_name):
             
             
             message = "tried to wade into the black water, but didn't make it far."
-            if checkLocaleMove(1,'posY') == True:
+            if checkLocaleMove(1,'posY',whom) == True:
                 changeLocale(1,'posY',currentUsername)
                 giveActionPoints(currentUsername,-1)
                 message = "went North"
@@ -90,7 +87,7 @@ def takeAction(full_name):
             
             
             message = "tried to wade into the yellow water, but didn't make it far."
-            if checkLocaleMove(-1,'posY') == True:
+            if checkLocaleMove(-1,'posY',whom) == True:
                 changeLocale(-1,'posY',currentUsername)
                 giveActionPoints(currentUsername,-1)
                 message = "went South"
@@ -99,7 +96,7 @@ def takeAction(full_name):
             
             
             message = "tried to wade into the pink water, but didn't make it far."
-            if checkLocaleMove(1,'posX') == True:
+            if checkLocaleMove(1,'posX',whom) == True:
                 changeLocale(1,'posX',currentUsername)
                 giveActionPoints(currentUsername,-1)
                 message = "went East"
@@ -108,7 +105,7 @@ def takeAction(full_name):
             
             
             message = "tried to wade into the green water, but didn't make it far."
-            if checkLocaleMove(-1,'posX') == True:
+            if checkLocaleMove(-1,'posX',whom) == True:
                 changeLocale(-1,'posX',currentUsername)
                 giveActionPoints(currentUsername,-1)
                 message = "went West"
@@ -118,14 +115,14 @@ def takeAction(full_name):
     if action == "punch":
         
         message = ("realized there is no person named "+object+" here to punch. He punched the air in vain.")
-        if sameCurrentLocation(object) != None:
+        if sameCurrentLocation(object,currentUsername) != None:
             message = ("punched "+object)
             changeHealth(object, -1)
             giveActionPoints(currentUsername,-1)
 
     if action == "stab":
         message = ("realized there is no person named "+object+" here to stab. He stabbed at the whistling air in vain.")
-        if sameCurrentLocation(object) != None:
+        if sameCurrentLocation(object,currentUsername) != None:
             message = ("stabbed "+object)
             changeHealth(object, -2)
             giveActionPoints(currentUsername,-1)
@@ -135,22 +132,25 @@ def takeAction(full_name):
         message = "thought he could take the uh thing"
         item = getItemPlace(object)
         
-        if (str(item[0]) == str(g.location['id'])) and (item[1] == 1):
+        if (str(item[0]) == str(getUserLocationID(whom))) and (item[1] == 1):
             message = "didn't have room on his person for the "+object
             
-            if g.user['room'] > len(g.inventory):
+            
+            
+                         
+            if  whom['room'] > len(getInventory(whom)):
                 message = "picked up the "+object
-                putItem(object, 'user', g.user['id'])
+                putItem(object, 'user', whom['id'])
                 giveActionPoints(currentUsername,-1)
 
     if action == "drop":
         message = "thought he could drop the "+object
         item = getItemPlace(object)
         
-        if (str(item[0]) == str(g.user['id'])) and (item[1] == 0):
+        if (str(item[0]) == str(whom['id'])) and (item[1] == 0):
             message = "dropped the "+object
-            click.echo(str(object) + 'location' + str(g.location['id']))
-            putItem(object, 'location', g.location['id'])
+            
+            putItem(object, 'location', getUserLocationID(whom))
             giveActionPoints(currentUsername,-1)
 
 
@@ -204,9 +204,9 @@ def changeLocale(amount,direction,who):
     
     return
 
-def checkLocaleMove(amount,direction):
-    click.echo(str((int(g.user[direction]) + amount)))
-    if ((int(g.user[direction]) + amount) > -1) and (int(g.user[direction]) + amount) < gridSize:
+def checkLocaleMove(amount,direction, who):
+    
+    if ((int(who[direction]) + amount) > -1) and (int(who[direction]) + amount) < gridSize:
         
         return True
 
@@ -236,6 +236,28 @@ def putItem(itemName, ownerType, ownerID):
         )
     db.commit()
     return False
+
+def getInventory(who):
+
+    inventory = []
+    getter = get_db().execute(
+        'SELECT * FROM item WHERE ownerID = ? AND onGround = 0', (who['id'],)
+            
+        ).fetchall()
+    
+    for q in getter:
+        inventory.append(q)
+    click.echo(str(inventory))
+    return inventory
+
+def getUserLocationID(who):
+
+    location = get_db().execute(
+    'SELECT * FROM location WHERE posX = ? AND posY = ?', (who['posX'],who['posY'])
+        
+    ).fetchone()
+
+    return location['id']
 
 
 

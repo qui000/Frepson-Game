@@ -22,11 +22,15 @@ knife = item('knife', 8, 'stab',1)
 needle = item('needle', 1, 'stick',2)
 rock = item('rock', 10, 'throw',3)
 
-all_items = [knife, needle, rock]
+
+ground_items = [knife, needle, rock]
+starting_items = []
+
+
 
 def giveItems():
    
-   return all_items
+   return ground_items
 
 
 
