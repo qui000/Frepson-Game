@@ -140,6 +140,7 @@ def takeAction(full_name,whom,describe):
 
             if getUserHealth(object) <= 0:
                 message = ("punched and killed "+object+". A heart's screen is it's hands it seems.")
+                dropInventory(object)
                 killUser(object)
             else:
                 message = ("punched "+object)
@@ -154,6 +155,7 @@ def takeAction(full_name,whom,describe):
             if getUserHealth(object) <= 0:
                 message = ("stabbed and killed "+object+". A heart's screen is it's hands it seems.")
                 killUser(object)
+                dropInventory(object)
             else:
                 message = ("stabbed "+object)
 
@@ -210,24 +212,24 @@ def takeAction(full_name,whom,describe):
             
     return message
         
-def changeHealth(who, amount):
+def changeHealth(username, amount):
     db = get_db()
     db.execute(
                 'UPDATE user SET health = health + ? WHERE username = ?',
-                (amount, who),
+                (amount, username),
             )
     db.commit()
 
     return
 
-def changeLocale(amount,direction,who):
+def changeLocale(amount,direction,username):
     
 
     if direction == 'posY':
         db = get_db()
         db.execute(
                     'UPDATE user SET posY = posY + ? WHERE username = ?',
-                    (amount,who),
+                    (amount,username),
                 )
         db.commit()
 
@@ -235,7 +237,7 @@ def changeLocale(amount,direction,who):
         db = get_db()
         db.execute(
                     'UPDATE user SET posX = posX + ? WHERE username = ?',
-                    (amount,who),
+                    (amount,username),
                 )
         db.commit()
     
@@ -305,6 +307,15 @@ def getUserHealth(username):
 
     return int(location[0])
 
+def dropInventory(username):
+
+    who = get_db().execute(
+    'SELECT * FROM user WHERE username = ?', (username,)
+        
+    ).fetchone()
+
+    for q in getInventory(who):
+        putItem(q['full_name'],'location',getUserLocationID(who))
 
 
 

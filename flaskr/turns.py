@@ -35,8 +35,9 @@ def highestID():
                 
             ).fetchone()
     
-    
-    return int(highestID['id'])
+    if highestID != None:
+        return int(highestID['id'])
+    return 9999
 
 def lowestID():
 
@@ -45,8 +46,9 @@ def lowestID():
             'SELECT MIN(id) AS id FROM user WHERE canAct = 1',
                 
             ).fetchone()
-    
-    return int(lowestID['id'])
+    if lowestID != None:
+        return int(lowestID['id'])
+    return 9999
 
 def nextID():
 
@@ -56,8 +58,9 @@ def nextID():
                 
             ).fetchall()
     
-    if int(largerIDs[0]['id']):
+    if largerIDs != None:
         return int(largerIDs[0]['id'])
+    return 9999
 
 def changeTurn():
 
