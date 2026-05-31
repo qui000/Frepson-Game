@@ -35,11 +35,11 @@
   
   {% if g.user %}
   <h4><u>Players</u></h4>
-    {% for user in users%}
+    {% for user in usersActing%}
       {% if g.gamestate['turn'] == user['id']%}
-        <div><b><u>{{ user['username'] }}: {{ user['id'] }}</u></b></div>
+        <div><b><u>{{ user['username'] }}</u></b></div>
       {% else %}
-        <div>{{ user['username'] }}: {{ user['id'] }}</div>
+        <div>{{ user['username'] }}</div>
       {% endif %}
     
     {% endfor%}

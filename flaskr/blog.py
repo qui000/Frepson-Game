@@ -5,13 +5,29 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
-from flaskr.actions import takeAction, giveAllActions
-from flaskr.turns import giveActionPoints, checkTurn
+from flaskr.actions import takeAction, giveAllActions, hostileTurn
+from flaskr.turns import giveActionPoints, checkTurn, currentTurnUser
+
+import time
 
 bp = Blueprint('blog', __name__)
 
 @bp.route('/')
 def index():
+
+
+    if currentTurnUser():
+
+        if (currentTurnUser()['action_points'] == 0) and checkTurn() == int(currentTurnUser()['id']):
+            giveActionPoints(currentTurnUser()['username'], 5)
+
+        if (currentTurnUser()['kind'] != 'player'):
+            if currentTurnUser()['kind'] == 'hostile':
+                time.sleep(1)
+                hostileTurn(currentTurnUser())
+
+
+
     db = get_db()
     posts = db.execute(
         'SELECT p.id, title, body, created, author_id, username'
@@ -31,21 +47,27 @@ def index():
         ' ORDER BY id ASC'
     ).fetchall()
 
+    usersActing = db.execute(
+        'SELECT id, username'
+        ' FROM user'
+        ' WHERE canAct = 1'
+        ' ORDER BY id ASC'
+    ).fetchall()
 
-    if g.user: 
+
+
+
+
+
         
-        if (g.user['action_points'] == 0) and checkTurn() == int(g.user['id']):
-            giveActionPoints(g.user['username'], 5)
-        
-        
-
-            
 
 
 
 
 
-    return render_template('blog/index.html', posts=posts, acts=acts, users=users)
+
+
+    return render_template('blog/index.html', posts=posts, acts=acts, users=users, usersActing=usersActing)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -95,19 +117,17 @@ def act():
             flash(error)
         else:
 
-            action_message = takeAction(turn_action, g.user)
+            action_message = takeAction(turn_action, g.user, turn_description)
+            
 
             if action_message == ('It is not your turn.') or action_message == ('You cannot do that.'):
                 flash(action_message)
                 return redirect(url_for('blog.index'))
             
-            db = get_db()
-            db.execute(
-                'INSERT INTO act (turn_action, turn_description, author_id)'
-                ' VALUES (?, ?, ?)',
-                (action_message, turn_description, g.user['id'])
-            )
-            db.commit()
+
+
+
+
             
             return redirect(url_for('blog.index'))
 

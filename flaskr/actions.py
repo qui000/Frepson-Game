@@ -4,13 +4,15 @@ from flask import (
 
 from flaskr.db import get_db
 from flaskr.turns import giveActionPoints, changeTurn, checkTurn
+from flaskr.enemies import spawnEnemy, getAllEnemies, killUser
 
 import click
+import random
 
 gridSize = 2
 
 def giveAllActions(who):
-    base_actions = ["move","punch","take","drop"]
+    base_actions = ["move","punch","take","drop","spawn"]
     
     if getInventory(who):
 
@@ -21,13 +23,12 @@ def giveAllActions(who):
             ).fetchone()[0]
 
             base_actions.append(name)
+    return base_actions
             
 
     
 
-    all_actions = base_actions
-    click.echo(all_actions)
-    return all_actions
+
 
 def canAction(action,who):
 
@@ -47,14 +48,32 @@ def sameCurrentLocation(username,username2):
             'SELECT id FROM user WHERE posX = ? AND posY = ? AND username = ?', (user_detail['posX'], user_detail['posY'], username2,)
             ).fetchone()
     
-    click.echo(user_detail2)
-    return user_detail
-
-
-
-def takeAction(full_name,whom):
     
-    message = None
+    return user_detail
+def allSameLocation(who):
+
+    guys = []
+    targets = get_db().execute(
+        'SELECT * FROM user WHERE posX = ? AND posY = ?', (who['posX'], who['posY'])
+     ).fetchall()
+    
+    for q in targets:
+        if q['username'] != who['username']:
+            guys.append(q)
+    return guys
+
+def targetUsernames(who):
+    
+    targets = []
+    for q in allSameLocation(who):
+        if (q['alive'] == 1) or (q['canAct'] == 1):
+            targets.append(q['username'])
+    return targets
+    
+    
+def takeAction(full_name,whom,describe):
+    
+    message = "fooled around."
     name = full_name.split()
     action = name[0].lower()
     last_turn = False
@@ -116,16 +135,29 @@ def takeAction(full_name,whom):
         
         message = ("realized there is no person named "+object+" here to punch. He punched the air in vain.")
         if sameCurrentLocation(object,currentUsername) != None:
-            message = ("punched "+object)
             changeHealth(object, -1)
             giveActionPoints(currentUsername,-1)
+
+            if getUserHealth(object) <= 0:
+                message = ("punched and killed "+object+". A heart's screen is it's hands it seems.")
+                killUser(object)
+            else:
+                message = ("punched "+object)
+
 
     if action == "stab":
         message = ("realized there is no person named "+object+" here to stab. He stabbed at the whistling air in vain.")
         if sameCurrentLocation(object,currentUsername) != None:
-            message = ("stabbed "+object)
+            
             changeHealth(object, -2)
             giveActionPoints(currentUsername,-1)
+            if getUserHealth(object) <= 0:
+                message = ("stabbed and killed "+object+". A heart's screen is it's hands it seems.")
+                killUser(object)
+            else:
+                message = ("stabbed "+object)
+
+
 
 
     if action == "take":
@@ -153,20 +185,25 @@ def takeAction(full_name,whom):
             putItem(object, 'location', getUserLocationID(whom))
             giveActionPoints(currentUsername,-1)
 
+    if action == "spawn":
+        spawnEnemy(getAllEnemies()[0],g.location)
 
 
 
 
 
+    if message != "fooled around.":
 
-
-
-    if (message != None):
+        db = get_db()
+        db.execute(
+            'INSERT INTO act (turn_action, author_id, turn_description)'
+            ' VALUES (?, ?, ?)',
+            (message, whom['id'], describe)
+        )
+        db.commit()
 
         if last_turn == True:
             changeTurn()
-    else:
-        message = "fooled around."
             
         
         
@@ -247,7 +284,7 @@ def getInventory(who):
     
     for q in getter:
         inventory.append(q)
-    click.echo(str(inventory))
+    
     return inventory
 
 def getUserLocationID(who):
@@ -259,5 +296,51 @@ def getUserLocationID(who):
 
     return location['id']
 
+def getUserHealth(username):
+
+    location = get_db().execute(
+    'SELECT health FROM user WHERE username = ?', (username,)
+        
+    ).fetchone()
+
+    return int(location[0])
+
+
+
+
+def hostileTurn(hostile):
+
+    
+    if targetUsernames(hostile) == []:
+        changeTurn()
+        killUser(hostile['username'])
+        return None
+
+
+    
+    
+    
+    while hostile['action_points'] > 0:
+
+
+
+        hostile = get_db().execute(
+        'SELECT * FROM user WHERE username = ?', (hostile['username'],)
+        ).fetchone()
+        click.echo(str(hostile['username']))
+
+        
+
+        if hostile != None:
+        
+            turn_action = "punch "+str(random.choice(targetUsernames(hostile)))
+            
+            
+            action_message = takeAction(turn_action, hostile, "My anger steams. If my claws don't harm, I hope this will sharpen them.")
+
+    return action_message
+   
+    
+    
 
 

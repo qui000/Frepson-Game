@@ -19,10 +19,45 @@ def giveActionPoints(username, number):
     return
 
 def checkTurn():
-    return int(g.gamestate['turn'])
+
+    
+    gamestate = get_db().execute(
+            'SELECT * FROM gamestate'
+        ).fetchone()
+        
+    return int(gamestate['turn'])
 
 def highestID():
-    return int(g.highestID['id'])
+
+    
+    highestID = get_db().execute(
+            'SELECT MAX(id) AS id FROM user WHERE canAct = 1',
+                
+            ).fetchone()
+    
+    
+    return int(highestID['id'])
+
+def lowestID():
+
+    
+    lowestID = get_db().execute(
+            'SELECT MIN(id) AS id FROM user WHERE canAct = 1',
+                
+            ).fetchone()
+    
+    return int(lowestID['id'])
+
+def nextID():
+
+    
+    largerIDs = get_db().execute(
+            'SELECT id AS id FROM user WHERE id > ? AND canAct = 1 ORDER BY id ASC', (checkTurn(),)
+                
+            ).fetchall()
+    
+    if int(largerIDs[0]['id']):
+        return int(largerIDs[0]['id'])
 
 def changeTurn():
 
@@ -32,7 +67,7 @@ def changeTurn():
         db = get_db()
 
         db.execute(
-            'UPDATE gamestate SET turn = 1'
+            'UPDATE gamestate SET turn = ?', (lowestID(), )
             
         )
         db.commit()
@@ -40,7 +75,7 @@ def changeTurn():
         db = get_db()
 
         db.execute(
-            'UPDATE gamestate SET gameloops = gameloops + 1'
+            'UPDATE gamestate SET gameloops = gameloops + 1', 
             
         )
         db.commit()
@@ -49,12 +84,22 @@ def changeTurn():
     db = get_db()
 
     db.execute(
-        'UPDATE gamestate SET turn = turn + 1'
+        'UPDATE gamestate SET turn = ?', (nextID(), )
         
     )
     db.commit()
+    click.echo("changed turn")
 
     return
+
+def currentTurnUser():
+
+    theItem = get_db().execute(
+        'SELECT * FROM user WHERE id = ?', (checkTurn(),)
+        ).fetchone()
+    click.echo("checked turn")
+    
+    return theItem
 
 
 

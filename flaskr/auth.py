@@ -6,7 +6,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import get_db
-from flaskr.turns import checkTurn, giveActionPoints
+from flaskr.turns import checkTurn
 
 
 
@@ -79,6 +79,7 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
+
         
         g.user = get_db().execute(
             'SELECT * FROM user WHERE id = ?', (user_id,)
@@ -125,7 +126,16 @@ def load_logged_in_user():
             for q in grabber:
                 if q != g.user:
                     g.neighbors.append(q)
+
+            g.turnUser = get_db().execute(
+                'SELECT * FROM user WHERE id = ?', (checkTurn(),)
+                ).fetchone()
             
+
+
+
+
+                
 
             
 

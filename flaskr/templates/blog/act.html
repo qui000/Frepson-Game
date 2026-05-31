@@ -46,9 +46,14 @@
         {% if g.neighbors %}
             <div>You also see 
                     {% for q in g.neighbors %}
-                        {{ q['username'] }}, 
+                        {{ q['username'] }} 
+                        {% if q['mood'] != 'normal' %}
+                            looking all {{q['mood']}}
+                        {% endif%},
+                    
                     {% endfor %}
-                    standing a little too close.
+
+                    just a bit too close.
                 
                 
                 
