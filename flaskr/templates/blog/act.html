@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}New Post{% endblock %}</h1>
+  <h1>{% block title %}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-    <h2>Your Character</h2>
+    <h2>{{g.user['username']}}</h2>
     {% if g.user %}
     
         <div>Health: {{ g.user['health'] }}<br>Action Points: {{ g.user['action_points'] }}</div>

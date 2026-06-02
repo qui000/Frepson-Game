@@ -8,6 +8,7 @@ from flaskr.enemies import spawnEnemy, getAllEnemies, killUser
 
 import click
 import random
+import time
 
 gridSize = 2
 
@@ -322,18 +323,18 @@ def dropInventory(username):
 def hostileTurn(hostile):
 
     
-    if targetUsernames(hostile) == []:
-        changeTurn()
-        killUser(hostile['username'])
-        return None
 
 
-    
     
     
     while hostile['action_points'] > 0:
 
-
+        time.sleep(1)
+        if targetUsernames(hostile) == []:
+            changeTurn()
+            killUser(hostile['username'])
+            return None
+        
 
         hostile = get_db().execute(
         'SELECT * FROM user WHERE username = ?', (hostile['username'],)
