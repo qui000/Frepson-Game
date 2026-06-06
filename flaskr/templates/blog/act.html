@@ -43,9 +43,9 @@
             </div>
         {% endif %}
         
-        {% if g.neighbors %}
+        {% if g.neighborsVisible %}
             <div>You also see 
-                    {% for q in g.neighbors %}
+                    {% for q in g.neighborsVisible %}
                         {{ q['username'] }} 
                         {% if q['mood'] != 'normal' %}
                             looking all {{q['mood']}}

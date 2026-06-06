@@ -8,8 +8,8 @@ from flaskr.db import get_db
 import click
 import random
 
-class enemy:
-  def __init__(self, username, health, max_health, action_points, room, visible=1, alive=1, canAct=1, mood="normal", kind="hostile", posX=0, posY=0 ):
+class follower:
+  def __init__(self, username, health, max_health, action_points, room, kind, visible=1, alive=1, canAct=1, mood="normal", posX=0, posY=0 ):
     self.username = username
     self.health = health
     self.action_points = action_points
@@ -24,19 +24,19 @@ class enemy:
     self.visible = visible
 
 
-bear = enemy('bear',15,25,6,1)
-all_enemies = [bear]
+dalmation = follower('dalmation',6,6,3,1,"")
+all_followers = [dalmation]
 
-def getAllEnemies():
+def getAllFollowers():
    
-   return all_enemies
-def spawnEnemy(which, where):
+   return all_followers
+def spawnFollower(which, where, whoseUsername):
 
 
     db = get_db()
     db.execute(
         "INSERT INTO user (username, password, kind, posX, posY) VALUES (?, ?, ?, ?, ?)",
-        (which.username, '123', 'hostile', where['posX'], where['posY']),
+        (which.username, '123', whoseUsername, where['posX'], where['posY']),
     )
     db.commit()
 
@@ -46,7 +46,7 @@ def killUser(username):
     db = get_db()
 
     db.execute(
-        'UPDATE user SET mood = ?, canAct = 0, alive = 0, visible = 0 WHERE username = ?', ('dead',username),
+        'UPDATE user SET mood = ?, canAct = 0, alive = 0 WHERE username = ?', ('dead',username),
         
     )
     db.commit()

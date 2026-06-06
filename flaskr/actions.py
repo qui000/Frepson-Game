@@ -5,7 +5,7 @@ from flask import (
 from flaskr.db import get_db
 from flaskr.turns import giveActionPoints, changeTurn, checkTurn
 from flaskr.enemies import spawnEnemy, getAllEnemies, killUser
-
+from flaskr.followers import getAllFollowers, spawnFollower
 import click
 import random
 import time
@@ -13,7 +13,13 @@ import time
 gridSize = 2
 
 def giveAllActions(who):
-    base_actions = ["move","punch","take","drop","spawn"]
+
+    match who['mood']:
+
+        case "crippled":
+            base_actions = ["move"]
+        case "normal":
+            base_actions = ["move","punch","take","drop","give","spawn"]
     
     if getInventory(who):
 
@@ -77,10 +83,13 @@ def takeAction(full_name,whom,describe):
     message = "fooled around."
     name = full_name.split()
     action = name[0].lower()
+    subjects = name[1:]
+    if subjects != []:
+        object = subjects[0]
+        click.echo(str(object))
     last_turn = False
     currentUsername = whom['username']
-    if len(name) > 1:
-        object = name[1]
+
 
     if (int(whom['action_points']) < 1) or checkTurn() != int(whom['id']):
         return 'It is not your turn.'
@@ -90,106 +99,124 @@ def takeAction(full_name,whom,describe):
         last_turn = True
         
 
+    if len(subjects) == 1:
 
+        if action == "move":
+            
+            if object == "north":
+                
+                
+                message = "tried to wade into the black water, but didn't make it far."
+                if checkLocaleMove(1,'posY',whom) == True:
+                    changeLocale(1,'posY',currentUsername)
+                    giveActionPoints(currentUsername,-1)
+                    message = "went North"
 
-    if action == "move":
-        object = object.lower()
-        if object == "north":
+            if object == "south":
+                
+                
+                message = "tried to wade into the yellow water, but didn't make it far."
+                if checkLocaleMove(-1,'posY',whom) == True:
+                    changeLocale(-1,'posY',currentUsername)
+                    giveActionPoints(currentUsername,-1)
+                    message = "went South"
             
+            if object == "east":
+                
+                
+                message = "tried to wade into the pink water, but didn't make it far."
+                if checkLocaleMove(1,'posX',whom) == True:
+                    changeLocale(1,'posX',currentUsername)
+                    giveActionPoints(currentUsername,-1)
+                    message = "went East"
+
+            if object == "west":
+                
+                
+                message = "tried to wade into the green water, but didn't make it far."
+                if checkLocaleMove(-1,'posX',whom) == True:
+                    changeLocale(-1,'posX',currentUsername)
+                    giveActionPoints(currentUsername,-1)
+                    message = "went West"
+                
+                
+
+        if action == "punch":
             
-            message = "tried to wade into the black water, but didn't make it far."
-            if checkLocaleMove(1,'posY',whom) == True:
-                changeLocale(1,'posY',currentUsername)
+            message = ("realized there is no person named "+object+" here to punch. He punched the air in vain.")
+            if sameCurrentLocation(object,currentUsername) != None:
+                changeHealth(object, -1)
                 giveActionPoints(currentUsername,-1)
-                message = "went North"
 
-        if object == "south":
-            
-            
-            message = "tried to wade into the yellow water, but didn't make it far."
-            if checkLocaleMove(-1,'posY',whom) == True:
-                changeLocale(-1,'posY',currentUsername)
+                if getUserHealth(object) <= 0:
+                    message = ("punched and killed "+object+". A heart's screen is it's hands it seems.")
+                    dropInventory(object)
+                    killUser(object)
+                else:
+                    message = ("punched "+object)
+
+
+        if action == "stab":
+            message = ("realized there is no person named "+object+" here to stab. He stabbed at the whistling air in vain.")
+            if sameCurrentLocation(object,currentUsername) != None:
+                
+                changeHealth(object, -2)
                 giveActionPoints(currentUsername,-1)
-                message = "went South"
-        
-        if object == "east":
+                if getUserHealth(object) <= 0:
+                    message = ("stabbed and killed "+object+". A heart's screen is it's hands it seems.")
+                    killUser(object)
+                    dropInventory(object)
+                else:
+                    message = ("stabbed "+object)
+
+
+
+
+        if action == "take":
+            message = "thought he could take the uh thing"
+            item = getItemPlace(object)
             
+            if (str(item[0]) == str(getUserLocationID(whom))) and (item[1] == 1):
+                message = "didn't have room on his person for the "+object
+                
+                
+                
+                                
+                if  whom['room'] > len(getInventory(whom)):
+                    message = "picked up the "+object
+                    putItem(object, 'user', currentUsername)
+                    giveActionPoints(currentUsername,-1)
+
+        if action == "drop":
+            message = "thought he could drop the "+object
+            item = getItemPlace(object)
             
-            message = "tried to wade into the pink water, but didn't make it far."
-            if checkLocaleMove(1,'posX',whom) == True:
-                changeLocale(1,'posX',currentUsername)
+            if (str(item[0]) == str(whom['id'])) and (item[1] == 0):
+                message = "dropped the "+object
+                
+                putItem(object, 'location', getUserLocationID(whom))
                 giveActionPoints(currentUsername,-1)
-                message = "went East"
 
-        if object == "west":
-            
-            
-            message = "tried to wade into the green water, but didn't make it far."
-            if checkLocaleMove(-1,'posX',whom) == True:
-                changeLocale(-1,'posX',currentUsername)
-                giveActionPoints(currentUsername,-1)
-                message = "went West"
-            
-            
-
-    if action == "punch":
-        
-        message = ("realized there is no person named "+object+" here to punch. He punched the air in vain.")
-        if sameCurrentLocation(object,currentUsername) != None:
-            changeHealth(object, -1)
-            giveActionPoints(currentUsername,-1)
-
-            if getUserHealth(object) <= 0:
-                message = ("punched and killed "+object+". A heart's screen is it's hands it seems.")
-                dropInventory(object)
-                killUser(object)
+        if action == "spawn":
+            rando = random.choice([1,2])
+            if rando == 1:
+                spawnEnemy(getAllEnemies()[0],g.location)
             else:
-                message = ("punched "+object)
-
-
-    if action == "stab":
-        message = ("realized there is no person named "+object+" here to stab. He stabbed at the whistling air in vain.")
-        if sameCurrentLocation(object,currentUsername) != None:
-            
-            changeHealth(object, -2)
-            giveActionPoints(currentUsername,-1)
-            if getUserHealth(object) <= 0:
-                message = ("stabbed and killed "+object+". A heart's screen is it's hands it seems.")
-                killUser(object)
-                dropInventory(object)
-            else:
-                message = ("stabbed "+object)
-
-
-
-
-    if action == "take":
-        message = "thought he could take the uh thing"
-        item = getItemPlace(object)
+                spawnFollower(getAllFollowers()[0],g.location,currentUsername)
+    
+    if len(subjects) == 2:
         
-        if (str(item[0]) == str(getUserLocationID(whom))) and (item[1] == 1):
-            message = "didn't have room on his person for the "+object
-            
-            
-            
-                         
-            if  whom['room'] > len(getInventory(whom)):
-                message = "picked up the "+object
-                putItem(object, 'user', whom['id'])
+        if action == "give":
+            reciever = getUser(object[0])
+            item = getItemPlace(object[1])
+            message = "thought he could drop the "+reciever['username']
+            if  (str(item[0]) == str(whom['id'])) and (item[1] == 0) and (reciever['room'] > len(getInventory(reciever))):
+                message = "gave the "+object[1]+" to "+reciever['username']
+                putItem(object[1], 'user', reciever['username'])
                 giveActionPoints(currentUsername,-1)
-
-    if action == "drop":
-        message = "thought he could drop the "+object
-        item = getItemPlace(object)
-        
-        if (str(item[0]) == str(whom['id'])) and (item[1] == 0):
-            message = "dropped the "+object
             
-            putItem(object, 'location', getUserLocationID(whom))
-            giveActionPoints(currentUsername,-1)
 
-    if action == "spawn":
-        spawnEnemy(getAllEnemies()[0],g.location)
+        
 
 
 
@@ -258,9 +285,10 @@ def getItemPlace(itemName):
             'SELECT * FROM item WHERE full_name = ?', (itemName,)
             ).fetchone()
     
-    return [theItem['ownerID'],theItem['onGround']]
+    if theItem != None:
+        return [theItem['ownerID'],theItem['onGround']]
 
-def putItem(itemName, ownerType, ownerID):
+def putItem(itemName, ownerType, IDusername):
 
     theItem = get_db().execute(
             'SELECT * FROM item WHERE full_name = ?', (itemName,)
@@ -268,14 +296,19 @@ def putItem(itemName, ownerType, ownerID):
     value = 0
     if ownerType == 'location':
         value = 1
-
+        db = get_db()
+        db.execute(
+            'UPDATE item SET ownerID = ?, onGround = ? WHERE id = ?', (IDusername, value, theItem['id']),
+            )
+        db.commit()
+        return
     
     db = get_db()
     db.execute(
-        'UPDATE item SET ownerID = ?, onGround = ? WHERE id = ?', (ownerID, value, theItem['id']),
+        'UPDATE item SET ownerID = ?, onGround = ? WHERE id = ?', (getUser(IDusername)['id'], value, theItem['id']),
         )
     db.commit()
-    return False
+    return 
 
 def getInventory(who):
 
@@ -318,7 +351,12 @@ def dropInventory(username):
     for q in getInventory(who):
         putItem(q['full_name'],'location',getUserLocationID(who))
 
-
+def getUser(username):
+    location = get_db().execute(
+    'SELECT * FROM user WHERE username = ?', (username,)
+        
+    ).fetchone()
+    return location
 
 def hostileTurn(hostile):
 

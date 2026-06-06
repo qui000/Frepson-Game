@@ -54,6 +54,13 @@ def index():
         ' ORDER BY id ASC'
     ).fetchall()
 
+    usersVisible = db.execute(
+        'SELECT id, username'
+        ' FROM user'
+        ' WHERE visible = 1'
+        ' ORDER BY id ASC'
+    ).fetchall()
+
 
 
 
