@@ -35,8 +35,8 @@ def createLocations():
     for q in giveLocations():
         db = get_db()
         db.execute(
-            'INSERT INTO location (full_name, posX, posY) VALUES (?, ?, ?)',
-            (q.full_name, q.posX, q.posY),
+            'INSERT INTO location (full_name, posX, posY, action) VALUES (?, ?, ?, ?)',
+            (q.full_name, q.posX, q.posY, q.action),
 
         )
         db.commit()

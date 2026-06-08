@@ -10,7 +10,7 @@ import click
 import random
 import time
 
-gridSize = 2
+gridSize = 5
 
 def giveAllActions(who):
 
@@ -30,6 +30,12 @@ def giveAllActions(who):
             ).fetchone()[0]
 
             base_actions.append(name)
+
+    placeAction = getLocale(getUserLocationID(who))['action']
+
+    if placeAction != "None":
+            base_actions.append(placeAction)
+
     return base_actions
             
 
@@ -88,6 +94,7 @@ def takeAction(full_name,whom,describe):
         object = subjects[0]
         click.echo(str(object))
     last_turn = False
+    acted = False
     currentUsername = whom['username']
 
 
@@ -95,9 +102,15 @@ def takeAction(full_name,whom,describe):
         return 'It is not your turn.'
     if canAction(action,whom) == False:
         return 'You cannot do that.'
-    if int(whom['action_points']) == 1:
-        last_turn = True
+    
+       
         
+    if action == "sleep":
+        last_turn = True
+        giveActionPoints(currentUsername, -(int(whom['action_points'])))
+        changeMood(currentUsername, "normal")
+        acted = True
+        message = "slept fast and hard: surrendering their body to the ground."
 
     if len(subjects) == 1:
 
@@ -111,6 +124,7 @@ def takeAction(full_name,whom,describe):
                     changeLocale(1,'posY',currentUsername)
                     giveActionPoints(currentUsername,-1)
                     message = "went North"
+                    acted = True
 
             if object == "south":
                 
@@ -120,6 +134,7 @@ def takeAction(full_name,whom,describe):
                     changeLocale(-1,'posY',currentUsername)
                     giveActionPoints(currentUsername,-1)
                     message = "went South"
+                    acted = True
             
             if object == "east":
                 
@@ -129,6 +144,7 @@ def takeAction(full_name,whom,describe):
                     changeLocale(1,'posX',currentUsername)
                     giveActionPoints(currentUsername,-1)
                     message = "went East"
+                    acted = True
 
             if object == "west":
                 
@@ -138,6 +154,7 @@ def takeAction(full_name,whom,describe):
                     changeLocale(-1,'posX',currentUsername)
                     giveActionPoints(currentUsername,-1)
                     message = "went West"
+                    acted = True
                 
                 
 
@@ -147,7 +164,7 @@ def takeAction(full_name,whom,describe):
             if sameCurrentLocation(object,currentUsername) != None:
                 changeHealth(object, -1)
                 giveActionPoints(currentUsername,-1)
-
+                acted = True
                 if getUserHealth(object) <= 0:
                     message = ("punched and killed "+object+". A heart's screen is it's hands it seems.")
                     dropInventory(object)
@@ -162,6 +179,7 @@ def takeAction(full_name,whom,describe):
                 
                 changeHealth(object, -2)
                 giveActionPoints(currentUsername,-1)
+                acted = True
                 if getUserHealth(object) <= 0:
                     message = ("stabbed and killed "+object+". A heart's screen is it's hands it seems.")
                     killUser(object)
@@ -186,6 +204,7 @@ def takeAction(full_name,whom,describe):
                     message = "picked up the "+object
                     putItem(object, 'user', currentUsername)
                     giveActionPoints(currentUsername,-1)
+                    acted = True
 
         if action == "drop":
             message = "thought he could drop the "+object
@@ -214,6 +233,7 @@ def takeAction(full_name,whom,describe):
                 message = "gave the "+object[1]+" to "+reciever['username']
                 putItem(object[1], 'user', reciever['username'])
                 giveActionPoints(currentUsername,-1)
+                acted = True
             
 
         
@@ -231,8 +251,9 @@ def takeAction(full_name,whom,describe):
             (message, whom['id'], describe)
         )
         db.commit()
-
-        if last_turn == True:
+        if int(whom['action_points']) == 1:
+            last_turn = True
+        if last_turn == True and acted == True:
             changeTurn()
             
         
@@ -357,6 +378,25 @@ def getUser(username):
         
     ).fetchone()
     return location
+
+def getLocale(id):
+    location = get_db().execute(
+    'SELECT * FROM location WHERE id = ?', (id,)
+        
+    ).fetchone()
+    return location
+
+def changeMood(username, mood):
+
+    db = get_db()
+
+    db.execute(
+        'UPDATE user SET mood = ? WHERE username = ?',
+        (mood, username)
+    )
+    db.commit()
+
+    return
 
 def hostileTurn(hostile):
 
