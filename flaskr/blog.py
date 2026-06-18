@@ -7,8 +7,9 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 from flaskr.actions import takeAction, giveAllActions, hostileTurn
 from flaskr.turns import giveActionPoints, checkTurn, currentTurnUser
+from flaskr.followers import getAllFollowers
 
-import time
+import time, click
 
 bp = Blueprint('blog', __name__)
 
@@ -19,11 +20,16 @@ def index():
     if currentTurnUser():
 
         if (currentTurnUser()['action_points'] == 0) and checkTurn() == int(currentTurnUser()['id']):
-            giveActionPoints(currentTurnUser()['username'], 5)
+            click.echo("gave "+str(currentTurnUser()['username'])+" "+str((int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points'])))+" action points")
+            giveActionPoints(currentTurnUser()['username'], (int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points'])))
+            
+
+            for q in getAllFollowers(currentTurnUser()['username']):
+                giveActionPoints(q['username'],(int(q['max_action_points'])-int(q['action_points'])))
 
         if (currentTurnUser()['kind'] != 'player'):
             if currentTurnUser()['kind'] == 'hostile':
-                time.sleep(1)
+                
                 hostileTurn(currentTurnUser())
 
 

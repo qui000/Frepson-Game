@@ -8,11 +8,14 @@ import click
 
 
 class place:
-  def __init__(self, full_name, posX, posY, action="None"):
+  def __init__(self, full_name, posX, posY, action="None", fencedID=0, structure=0, structureOwnerID=0):
     self.full_name = full_name
     self.posX = posX
     self.posY = posY
     self.action = action
+    self.fencedID = fencedID
+    self.structure = structure
+    self.structureOwnerID = structureOwnerID
 
 
 startingPath = place('Little Clearing', 0, 0)

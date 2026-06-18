@@ -127,6 +127,16 @@ def load_logged_in_user():
                 if q != g.user:
                     g.neighborsVisible.append(q)
 
+            g.followers = []
+            taker = get_db().execute(
+                'SELECT * FROM user WHERE kind = ?', (g.user['username'],)
+                    
+                ).fetchall()
+            
+            for q in taker:
+                if q != g.user:
+                    g.followers.append(q)
+
             g.turnUser = get_db().execute(
                 'SELECT * FROM user WHERE id = ?', (checkTurn(),)
                 ).fetchone()

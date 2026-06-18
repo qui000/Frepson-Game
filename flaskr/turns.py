@@ -3,6 +3,7 @@ from flask import (
 )
 
 from flaskr.db import get_db
+from flaskr.followers import isFollower
 import click
 
 
@@ -31,10 +32,10 @@ def highestID():
 
     
     highestID = get_db().execute(
-            'SELECT MAX(id) AS id FROM user WHERE canAct = 1',
+            'SELECT MAX(id) AS id FROM user WHERE canAct = 1 AND kind IN ("player","hostile")',
                 
             ).fetchone()
-    
+    click.echo(str(highestID['id']))
     if highestID != None:
         return int(highestID['id'])
     return 9999
@@ -43,7 +44,7 @@ def lowestID():
 
     
     lowestID = get_db().execute(
-            'SELECT MIN(id) AS id FROM user WHERE canAct = 1',
+            'SELECT MIN(id) AS id FROM user WHERE canAct = 1 AND kind IN ("player","hostile")',
                 
             ).fetchone()
     if lowestID != None:
@@ -54,10 +55,9 @@ def nextID():
 
     
     largerIDs = get_db().execute(
-            'SELECT id AS id FROM user WHERE id > ? AND canAct = 1 ORDER BY id ASC', (checkTurn(),)
+            'SELECT id AS id FROM user WHERE id > ? AND canAct = 1 AND kind IN ("player","hostile") ORDER BY id ASC', (checkTurn(),)
                 
             ).fetchall()
-    
     if largerIDs != None:
         return int(largerIDs[0]['id'])
     return 9999
@@ -100,7 +100,6 @@ def currentTurnUser():
     theItem = get_db().execute(
         'SELECT * FROM user WHERE id = ?', (checkTurn(),)
         ).fetchone()
-    click.echo("checked turn")
     
     return theItem
 

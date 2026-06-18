@@ -9,10 +9,11 @@ import click
 import random
 
 class enemy:
-  def __init__(self, username, health, max_health, action_points, room, visible=1, alive=1, canAct=1, mood="normal", kind="hostile", posX=0, posY=0 ):
+  def __init__(self, username, health, max_health, action_points, max_action_points, room, visible=1, alive=1, canAct=1, mood="normal", kind="hostile", posX=0, posY=0 ):
     self.username = username
     self.health = health
     self.action_points = action_points
+    self.max_action_points = max_action_points
     self.posX = posX
     self.posY = posY
     self.max_health = max_health
@@ -24,7 +25,7 @@ class enemy:
     self.visible = visible
 
 
-bear = enemy('bear',15,25,6,1)
+bear = enemy('bear',15,25,1,6,1)
 all_enemies = [bear]
 
 def getAllEnemies():
@@ -35,8 +36,8 @@ def spawnEnemy(which, where):
 
     db = get_db()
     db.execute(
-        "INSERT INTO user (username, password, kind, posX, posY) VALUES (?, ?, ?, ?, ?)",
-        (which.username, '123', 'hostile', where['posX'], where['posY']),
+        "INSERT INTO user (username, password, kind, mood, posX, posY) VALUES (?, ?, ?, ?, ?, ?)",
+        (which.username, '123', 'hostile', which.mood, where['posX'], where['posY']),
     )
     db.commit()
 

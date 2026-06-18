@@ -5,30 +5,47 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{{g.user['username']}}</h2>
-    {% if g.user %}
-    
-        <div>Health: {{ g.user['health'] }}<br>Action Points: {{ g.user['action_points'] }}</div>
-        <div>Inventory:
-                {% for q in g.inventory %}
-                    {{ q['full_name'] }}, 
-            
+    <div class="player">
+        <h2>{{g.user['username']}}</h2>
+        {% if g.user %}
 
-                {% endfor %}
+            <div>Health: {{ g.user['health'] }}/{{ g.user['max_health'] }}<br>Action Points: {{ g.user['action_points'] }}/{{ g.user['max_action_points'] }}</div>
+            <div>Inventory:
+                    {% for q in g.inventory %}
+                        {{ q['full_name'] }}, 
+                
 
-
-
+                    {% endfor %}
 
 
+
+
+
+
+            </div>
+            <div><b>Actions:</b>
+            {% for act in allActs %}
+                {{ act }}, 
+                
+
+            {% endfor %}
+            </div>
 
         </div>
-        <div><b>Actions:</b>
-        {% for act in allActs %}
-            {{ act }}, 
-            
 
-        {% endfor %}
+
+
+        <h2>Followers:</h2>
+        {%if g.followers %}
+            {% for follower in g.followers %}
+                <h3>{{ follower['username'] }}</h3>
+                <div>Action Points: {{ follower['action_points'] }}/{{ follower['max_action_points'] }}</div>
+                
+
+            {% endfor %}
+        {% endif %}
         </div>
+
         <br>
         <h2>Current Location</h2>
         <div>You like to call this spot the: {{ g.location['full_name'] }}.</div>
