@@ -153,7 +153,7 @@ def takeAction(full_name,whom,describe):
             if object == "north":
                 
                 
-                message = "tried to wade into the black water, but didn't make it far."
+                message = "cannot go that way"
                 if checkLocaleMove(1,'posY',whom) == True:
                     changeLocale(1,'posY',currentUsername)
                     giveActionPoints(currentUsername,-1)
@@ -163,7 +163,7 @@ def takeAction(full_name,whom,describe):
             if object == "south":
                 
                 
-                message = "tried to wade into the yellow water, but didn't make it far."
+                message = "cannot go that way"
                 if checkLocaleMove(-1,'posY',whom) == True:
                     changeLocale(-1,'posY',currentUsername)
                     giveActionPoints(currentUsername,-1)
@@ -173,7 +173,7 @@ def takeAction(full_name,whom,describe):
             if object == "east":
                 
                 
-                message = "tried to wade into the pink water, but didn't make it far."
+                message = "cannot go that way"
                 if checkLocaleMove(1,'posX',whom) == True:
                     changeLocale(1,'posX',currentUsername)
                     giveActionPoints(currentUsername,-1)
@@ -183,7 +183,7 @@ def takeAction(full_name,whom,describe):
             if object == "west":
                 
                 
-                message = "tried to wade into the green water, but didn't make it far."
+                message = "cannot go that way"
                 if checkLocaleMove(-1,'posX',whom) == True:
                     changeLocale(-1,'posX',currentUsername)
                     giveActionPoints(currentUsername,-1)
@@ -291,7 +291,7 @@ def takeAction(full_name,whom,describe):
 
 
 
-    if message != "fooled around.":
+    if (message != "fooled around.") and (message != "cannot go that way"):
 
         db = get_db()
         db.execute(

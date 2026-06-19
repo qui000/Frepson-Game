@@ -74,9 +74,9 @@ def index():
 
         
 
+    
 
-
-
+    
 
 
 
@@ -133,16 +133,16 @@ def act():
             action_message = takeAction(turn_action, g.user, turn_description)
             
 
-            if action_message == ('It is not your turn.') or action_message == ('You cannot do that.'):
+            if action_message == ('It is not your turn.') or action_message == ('You cannot do that.') or action_message == ('cannot go that way'):
                 flash(action_message)
-                return redirect(url_for('blog.index'))
+                return redirect(url_for('blog.act'))
             
 
 
 
 
             
-            return redirect(url_for('blog.index'))
+            return redirect(url_for('blog.act'))
 
     return render_template('blog/act.html',allActs = giveAllActions(g.user))
 

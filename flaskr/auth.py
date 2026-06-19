@@ -141,6 +141,8 @@ def load_logged_in_user():
                 'SELECT * FROM user WHERE id = ?', (checkTurn(),)
                 ).fetchone()
             
+            g.link = 'backgrounds/'+str(g.location['full_name'])+'.png'
+            
 
 
 

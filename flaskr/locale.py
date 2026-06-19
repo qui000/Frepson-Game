@@ -20,7 +20,7 @@ class place:
 
 startingPath = place('Little Clearing', 0, 0)
 secondPath = place('Eastward Path', 1, 0)
-thirdPath = place('Signed Path: Spencward Manor', 2, 0)
+thirdPath = place('Signed Path - Spencward Manor', 2, 0)
 fourthPath = place('Path Along A Garden', 3, 0)
 fifthPath= place('Path Curving Northward', 4, 0)
 grandPorch = place('The Grand Porch', 4, 1)

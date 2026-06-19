@@ -5,32 +5,33 @@
 {% endblock %}
 
 {% block content %}
+
+
+
+
+
     <div class="player">
-        <h2>{{g.user['username']}}</h2>
+        
         {% if g.user %}
-
-            <div>Health: {{ g.user['health'] }}/{{ g.user['max_health'] }}<br>Action Points: {{ g.user['action_points'] }}/{{ g.user['max_action_points'] }}</div>
-            <div>Inventory:
-                    {% for q in g.inventory %}
-                        {{ q['full_name'] }}, 
-                
-
-                    {% endfor %}
-
-
-
-
-
-
+            <div class="sidenav">
+                <h2>{{g.user['username']}}</h2>
+                <img src="{{ url_for('static', filename='players/body.png' ) }}" />
+                <div>Health: {{ g.user['health'] }}/{{ g.user['max_health'] }}</div>
+                <div>Action Points: {{ g.user['action_points'] }}/{{ g.user['max_action_points'] }}</div>
             </div>
-            <div><b>Actions:</b>
-            {% for act in allActs %}
-                {{ act }}, 
-                
-
-            {% endfor %}
+            <div class="sidenavR">
+                <div>Inventory:
+                        {% for q in g.inventory %}
+                            {{ q['full_name'] }}, 
+                        {% endfor %}
+                </div>
+                <br>
+                <div><b>Actions:</b>
+                {% for act in allActs %}
+                    {{ act }}, 
+                {% endfor %}
+                </div>
             </div>
-
         </div>
 
 
@@ -47,35 +48,39 @@
         </div>
 
         <br>
-        <h2>Current Location</h2>
-        <div>You like to call this spot the: {{ g.location['full_name'] }}.</div>
-        {% if g.ground %}
-            <div>On the ground you see a 
-                    {% for q in g.ground %}
-                        {{ q['full_name'] }}, 
-                    {% endfor %}
-                
-                
-                
-            </div>
-        {% endif %}
-        
-        {% if g.neighborsVisible %}
-            <div>You also see 
-                    {% for q in g.neighborsVisible %}
-                        {{ q['username'] }} 
-                        {% if q['mood'] != 'normal' %}
-                            looking all {{q['mood']}}
-                        {% endif%},
+        <div class="player">
+            <h2>{{ g.location['full_name'] }}</h2>
+            <img src="{{ url_for('static', filename= g.link ) }}" />
+            
+            <div></div>
+            {% if g.ground %}
+                <div>On the ground you see a 
+                        {% for q in g.ground %}
+                            {{ q['full_name'] }}, 
+                        {% endfor %}
                     
-                    {% endfor %}
+                    
+                    
+                </div>
+            {% endif %}
+            
+            {% if g.neighborsVisible %}
+                <div>You also see 
+                        {% for q in g.neighborsVisible %}
+                            {{ q['username'] }} 
+                            {% if q['mood'] != 'normal' %}
+                                looking all {{q['mood']}}
+                            {% endif%},
+                        
+                        {% endfor %}
 
-                    just a bit too close.
-                
-                
-                
-            </div>
-        {% endif %}
+                        just a bit too close.
+                    
+                    
+                    
+                </div>
+            {% endif %}
+        </div>
 
     {% endif %}
     <form method="post">
