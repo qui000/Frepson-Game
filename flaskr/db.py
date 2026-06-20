@@ -47,8 +47,8 @@ def createItems():
     for q in giveItems():
         db = get_db()
         db.execute(
-            'INSERT INTO item (full_name, health, action, ownerID) VALUES (?, ?, ?, ?)',
-            (q.full_name, q.health, q.action, q.ownerID),
+            'INSERT INTO item (full_name, health, action, ownerID, armorType) VALUES (?, ?, ?, ?, ?)',
+            (q.full_name, q.health, q.action, q.ownerID, q.armorType),
 
         )
         db.commit()

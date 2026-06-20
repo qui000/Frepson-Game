@@ -23,9 +23,9 @@ def giveAllActions(who):
             base_actions.append("rise")
         
     
-    if getInventory(who):
+    if getInventory(who,'both'):
 
-        for q in getInventory(who):
+        for q in getInventory(who, 'both'):
             
             name = get_db().execute(
             'SELECT action FROM item WHERE id = ?', (q['id'],)
@@ -231,19 +231,30 @@ def takeAction(full_name,whom,describe):
 
         if action == "take":
             message = "thought he could take the uh thing"
-            item = getItemPlace(object)
+            itemPlace = getItemPlace(object)
+            item = getItem(object)
             
-            if (str(item[0]) == str(getUserLocationID(whom))) and (item[1] == 1):
-                message = "didn't have room on his person for the "+object
+            if item['armorType'] == 'None':
+                if (str(itemPlace[0]) == str(getUserLocationID(whom))) and (itemPlace[1] == 1):
+                    message = "didn't have room on his person for the "+object
+              
+                    if  whom['room'] > len(getInventory(whom,'inventory')):
+                        message = "picked up the "+object
+                        putItem(object, 'user', currentUsername)
+                        giveActionPoints(currentUsername,-1)
+                        acted = True
+            else:
+                message = "equipped the "+object
+                for q in getInventory(whom, 'armor'):
+                    if q['armorType'] == item['armorType']:
+                        putItem(q['full_name'], 'location', getUserLocationID(whom))
+                        message = message+" and dropped the "+q['full_name']
+
+                putItem(object, 'user', currentUsername)
+                giveActionPoints(currentUsername,-1)
+                acted = True
                 
-                
-                
-                                
-                if  whom['room'] > len(getInventory(whom)):
-                    message = "picked up the "+object
-                    putItem(object, 'user', currentUsername)
-                    giveActionPoints(currentUsername,-1)
-                    acted = True
+
 
         if action == "drop":
             message = "thought he could drop the "+object
@@ -261,13 +272,28 @@ def takeAction(full_name,whom,describe):
         
         if action == "give":
             reciever = getUser(subjects[0])
-            item = getItemPlace(subjects[1])
+            itemPlace = getItemPlace(subjects[1])
+            item = getItem(subjects[1])
             message = "thought he could drop the "+reciever['username']
-            if  (str(item[0]) == str(whom['id'])) and (item[1] == 0) and (reciever['room'] > len(getInventory(reciever))):
-                message = "gave the "+subjects[1]+" to "+reciever['username']
+
+            if item['armorType'] == 'None':
+                if  (str(itemPlace[0]) == str(whom['id'])) and (itemPlace[1] == 0) and (reciever['room'] > len(getInventory(reciever,'inventory'))):
+                    message = "gave the "+subjects[1]+" to "+reciever['username']
+                    putItem(subjects[1], 'user', reciever['username'])
+                    giveActionPoints(currentUsername,-1)
+                    acted = True
+
+            else:
+                message = "gave the "+subjects[1]+" to "+reciever['username']+" and he equipped it"
+                for q in getInventory(reciever, 'armor'):
+                    if q['armorType'] == item['armorType']:
+                        putItem(q['full_name'], 'location', getUserLocationID(reciever))
+                        message = message+" and dropped the "+q['full_name']
+
                 putItem(subjects[1], 'user', reciever['username'])
                 giveActionPoints(currentUsername,-1)
                 acted = True
+
     
     if action == "command":
         obeyer = object
@@ -383,13 +409,28 @@ def putItem(itemName, ownerType, IDusername):
     db.commit()
     return 
 
-def getInventory(who):
+def getInventory(who, armor):
 
     inventory = []
-    getter = get_db().execute(
-        'SELECT * FROM item WHERE ownerID = ? AND onGround = 0', (who['id'],)
+    match armor:
+
+        case 'inventory':
+            getter = get_db().execute(
+                'SELECT * FROM item WHERE ownerID = ? AND onGround = 0 AND armorType = ?', (who['id'], "None")
+                    
+                ).fetchall()
             
-        ).fetchall()
+        case 'both':
+            getter = get_db().execute(
+                'SELECT * FROM item WHERE ownerID = ? AND onGround = 0', (who['id'],)
+                    
+                ).fetchall()
+        
+        case 'armor':        
+            getter = get_db().execute(
+                'SELECT * FROM item WHERE ownerID = ? AND onGround = 0 AND armorType != ?', (who['id'], "None")
+                    
+                ).fetchall()
     
     for q in getter:
         inventory.append(q)
@@ -421,7 +462,7 @@ def dropInventory(username):
         
     ).fetchone()
 
-    for q in getInventory(who):
+    for q in getInventory(who,'both'):
         putItem(q['full_name'],'location',getUserLocationID(who))
 
 def getUser(username):
@@ -437,6 +478,14 @@ def getLocale(id):
         
     ).fetchone()
     return location
+
+
+def getItem(name):
+    item = get_db().execute(
+    'SELECT * FROM item WHERE full_name = ?', (name,)
+        
+    ).fetchone()
+    return item
 
 def changeMood(username, mood):
 
