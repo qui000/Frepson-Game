@@ -143,7 +143,12 @@ def load_logged_in_user():
             
             g.link = 'backgrounds/'+str(g.location['full_name'])+'.png'
             
+            g.clothesLinks = []
 
+            for q in g.inventory:
+                if q['armorType'] != 'None':
+                    g.clothesLinks.append('players/'+str(q['full_name'])+'.png')
+                    
 
 
 

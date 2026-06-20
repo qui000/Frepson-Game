@@ -23,9 +23,10 @@ needle = item('needle', 1, 'stick',2)
 rock = item('rock', 10, 'throw',3)
 turtleShell = item('shell', 10, 'throw',3,'helmet')
 hat = item('hat', 10, 'throw', 3, 'helmet')
+shirt = item('shirt', 10, 'throw', 3, 'shirt')
 
 
-ground_items = [knife, needle, rock, turtleShell, hat]
+ground_items = [knife, needle, rock, turtleShell, hat, shirt]
 starting_items = []
 
 

@@ -15,7 +15,14 @@
         {% if g.user %}
             <div class="sidenav">
                 <h2>{{g.user['username']}}</h2>
-                <img src="{{ url_for('static', filename='players/body.png' ) }}" />
+                <div class="picsparent">
+                    <img class="body" src="{{ url_for('static', filename='players/body.png' ) }}" />
+                    {% if g.clothesLinks %}
+                        {% for q in g.clothesLinks %}
+                            <img class="bodyclothe" src="{{ url_for('static', filename= q ) }}" style="position: absolute; translate: 0% 0%"  />
+                        {% endfor %}
+                    {% endif %}
+                </div>
                 <div>Health: {{ g.user['health'] }}/{{ g.user['max_health'] }}</div>
                 <div>Action Points: {{ g.user['action_points'] }}/{{ g.user['max_action_points'] }}</div>
             </div>

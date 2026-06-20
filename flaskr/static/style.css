@@ -1,6 +1,6 @@
 html { font-family: sans-serif; background: #eee; padding: 1rem; }
 body { max-width: 960px; margin: 0 auto; background: white; }
-h1 { font-family: serif; color: #ff00f2; margin: 1rem 0; }
+h1 { font-family: serif; color: #ff00f2; margin: 1rem 1rem; }
 h2 { font-family: serif; color: #390d64; margin: 1rem 0; }
 a { color: #0b531d; }
 hr { border: none; border-top: 1px solid lightgray; }
@@ -30,7 +30,7 @@ input[type=submit] { align-self: start; min-width: 10em; }
 /* The sidebar menu */
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 160px; /* Set the width of the sidebar */
+  width: 180px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -38,16 +38,34 @@ input[type=submit] { align-self: start; min-width: 10em; }
   background-color: #ffffff; /* Black */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
+  
 }
 
-.sidenav img {
-    margin-left: 5px;
-    margin-right: 1px;
-    width: 95%; 
-    height: 95%;
-    object-fit: contain;
-    margin-top: -100%;
-    margin-bottom: -90%;
+.picsparent {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  object-fit: contain;
+    
+
+  }
+
+
+.body {
+  top: 0px;
+  left: 0px;
+  position: relative;
+  object-fit: contain;
+
+    
+
+}
+
+.bodyclothe {
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  object-fit: contain;
 
 }
 
