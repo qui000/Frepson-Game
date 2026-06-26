@@ -5,7 +5,8 @@ from flask import (
 from flaskr.db import get_db
 from flaskr.turns import giveActionPoints, changeTurn, checkTurn
 from flaskr.enemies import spawnEnemy, getAllEnemies, killUser
-from flaskr.followers import getAllNPCs, spawnFollower, getAllFollowers, isFollower
+from flaskr.followers import spawnFollower, getAllFollowers, isFollower
+from flaskr.npcs import getAllNPCs
 import click
 import random
 import time

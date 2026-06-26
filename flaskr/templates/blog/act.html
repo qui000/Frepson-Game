@@ -93,7 +93,7 @@
     {% endif %}
     <form method="post">
         <label for="turn_action">Action</label>
-        <input name="turn_action" id="turn_action" value="{{ request.form['turn_action'] }}" required>
+        <input name="turn_action" id="turn_action" value="{{ request.form['turn_action'] }}" required autofocus>
         <label for="turn_description">Description</label>
         <textarea name="turn_description" id="turn_description">{{ request.form['turn_description'] }}</textarea>
         <input type="submit" value="Act">

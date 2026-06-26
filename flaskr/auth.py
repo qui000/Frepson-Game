@@ -129,7 +129,7 @@ def load_logged_in_user():
 
             g.followers = []
             taker = get_db().execute(
-                'SELECT * FROM user WHERE kind = ?', (g.user['username'],)
+                'SELECT * FROM user WHERE kind = ?', ("follower "+g.user['username'],)
                     
                 ).fetchall()
             

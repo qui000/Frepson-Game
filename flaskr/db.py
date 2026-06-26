@@ -5,7 +5,7 @@ import click
 from flask import current_app, g
 from flaskr.locale import giveLocations
 from flaskr.items import giveItems
-
+from flaskr.npcs import startingNPCs
 
 def get_db():
     if 'db' not in g:
@@ -54,7 +54,28 @@ def createItems():
         db.commit()
     return
 
+def createStartingNPCs():
+
+    for q in startingNPCs:
+        db = get_db()
+        db.execute(
+            "INSERT INTO user (username, password, health, max_health, room, kind, action_points, max_action_points, visible, alive, canAct, mood, posX, posY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (q.username, "123", q.health, q.max_health, q.room, q.kind, q.action_points, q.max_action_points, q.visible, q.alive, q.canAct, q.mood, q.posX, q.posY),
+        )
+        db.commit()
+    return
+
+def highestID_ALL():
+
     
+    highestID = get_db().execute(
+            'SELECT MAX(id) AS id FROM user',
+                
+            ).fetchone()
+    
+    if highestID != None:
+        return int(highestID['id'])
+    return 9999
 
 
 @click.command('init-db')
@@ -62,7 +83,14 @@ def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
 
-    startTurn = 1
+    
+    createLocations()
+    createItems()
+    createStartingNPCs()
+
+    
+    
+    startTurn = (highestID_ALL() + 1)
     db = get_db()
     db.execute(
         'INSERT INTO gamestate (turn) VALUES (?)',
@@ -70,12 +98,8 @@ def init_db_command():
 
     )
     db.commit()
-
-    createLocations()
-    createItems()
-
     
-
+    
     
 
 

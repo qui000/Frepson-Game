@@ -19,9 +19,11 @@ def index():
 
     if currentTurnUser():
 
+        thisMany =  (int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points']))
+
         if (currentTurnUser()['action_points'] == 0) and checkTurn() == int(currentTurnUser()['id']):
-            click.echo("gave "+str(currentTurnUser()['username'])+" "+str((int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points'])))+" action points")
-            giveActionPoints(currentTurnUser()['username'], (int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points'])))
+            click.echo("gave "+str(currentTurnUser()['username'])+" "+str(thisMany)+" action points")
+            giveActionPoints(currentTurnUser()['username'], thisMany)
             
 
             for q in getAllFollowers(currentTurnUser()['username']):
