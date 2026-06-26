@@ -28,31 +28,28 @@
                 <div>Action Points: {{ g.user['action_points'] }}/{{ g.user['max_action_points'] }}</div>
             </div>
             <div class="sidenavR">
-                <div>Inventory:
+                <div><h2>Inventory:</h2>
                         {% for q in g.inventory %}
                             {{ q['full_name'] }}, 
                         {% endfor %}
                 </div>
                 <br>
-                <div><b>Actions:</b>
+                <div><h2>Actions:</h2>
                 {% for act in allActs %}
                     {{ act }}, 
                 {% endfor %}
                 </div>
+                <h2>Followers:</h2>
+                {%if g.followers %}
+                    {% for follower in g.followers %}
+                        <h3>{{ follower['username'] }}</h3>
+                        <div>Action Points: {{ follower['action_points'] }}/{{ follower['max_action_points'] }}</div>
+                        
+
+                    {% endfor %}
+                {% endif %}
+                </div>
             </div>
-        </div>
-
-
-
-        <h2>Followers:</h2>
-        {%if g.followers %}
-            {% for follower in g.followers %}
-                <h3>{{ follower['username'] }}</h3>
-                <div>Action Points: {{ follower['action_points'] }}/{{ follower['max_action_points'] }}</div>
-                
-
-            {% endfor %}
-        {% endif %}
         </div>
 
         <br>
@@ -98,4 +95,10 @@
         <textarea name="turn_description" id="turn_description">{{ request.form['turn_description'] }}</textarea>
         <input type="submit" value="Act">
     </form>
+
+    
+
+
+
+
 {% endblock %}
