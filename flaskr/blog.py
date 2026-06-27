@@ -135,8 +135,8 @@ def act():
             action_message = takeAction(turn_action, g.user, turn_description)
             
 
-            if action_message == ('It is not your turn.') or action_message == ('You cannot do that.') or action_message == ('cannot go that way'):
-                flash(action_message)
+            if action_message[1] == False:
+                flash("You "+action_message[0])
                 return redirect(url_for('blog.act'))
             
 

@@ -6,6 +6,7 @@ from flask import current_app, g
 from flaskr.locale import giveLocations
 from flaskr.items import giveItems
 from flaskr.npcs import startingNPCs
+from flaskr.structures import starting_structures
 
 def get_db():
     if 'db' not in g:
@@ -35,8 +36,8 @@ def createLocations():
     for q in giveLocations():
         db = get_db()
         db.execute(
-            'INSERT INTO location (full_name, posX, posY, action, fencedID, structure, structureOwnerID) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            (q.full_name, q.posX, q.posY, q.action, q.fencedID, q.structure, q.structureOwnerID),
+            'INSERT INTO location (full_name, posX, posY, action, type, status) VALUES (?, ?, ?, ?, ?, ?)',
+            (q.full_name, q.posX, q.posY, q.action, q.type, q.status),
 
         )
         db.commit()
@@ -65,6 +66,17 @@ def createStartingNPCs():
         db.commit()
     return
 
+def createStartingStructures():
+
+    for q in starting_structures:
+        db = get_db()
+        db.execute(
+            "INSERT INTO structure (full_name, action, type, ownerID, level, posX, posY, health, max_health) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (q.full_name, q.action, q.type, q.ownerID, q.level, q.posX, q.posY, q.health, q.max_health),
+        )
+        db.commit()
+    return
+
 def highestID_ALL():
 
     
@@ -83,10 +95,11 @@ def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
 
-    
+
     createLocations()
     createItems()
     createStartingNPCs()
+    createStartingStructures()
 
     
     

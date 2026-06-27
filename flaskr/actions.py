@@ -307,7 +307,7 @@ def takeAction(full_name,whom,describe):
             message = "told "+obeyer+" something but wasn't able to yell it far enough."
             if sameCurrentLocation(currentUsername,obeyer) == True:
                 message = "told "+obeyer+" to do the impossible"
-                if takeAction(command,getUser(obeyer),"Coordinated action is the new joy, so they say.") != ('It is not your turn.' or 'You cannot do that.'):
+                if takeAction(command,getUser(obeyer),"Coordinated action is the new joy, so they say.")[1] == True:
                     message = "simply commanded it."
                     acted = False
         
@@ -338,7 +338,7 @@ def takeAction(full_name,whom,describe):
         
         
             
-    return message
+    return [message, acted]
         
 def changeHealth(username, amount):
     db = get_db()
@@ -527,7 +527,7 @@ def hostileTurn(hostile):
             turn_action = "punch "+str(random.choice(targetUsernames(hostile)))
             
             click.echo("hostile try")
-            action_message = takeAction(turn_action, hostile, "My anger steams. If my claws don't harm, I hope this will sharpen them.")
+            action_message = takeAction(turn_action, hostile, "My anger steams. If my claws don't harm, I hope this will sharpen them.")[0]
 
     return action_message
 
