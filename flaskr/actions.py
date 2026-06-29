@@ -95,7 +95,7 @@ def targetUsernames(who):
             targets.append(q['username'])
     return targets
     
-    
+# Returns (Action Message, Success, Last Turn?)
 def takeAction(full_name,whom,describe):
     
     message = "fooled around."
@@ -266,6 +266,7 @@ def takeAction(full_name,whom,describe):
                 
                 putItem(object, 'location', getUserLocationID(whom))
                 giveActionPoints(currentUsername,-1)
+                acted = True
 
 
     
@@ -338,7 +339,7 @@ def takeAction(full_name,whom,describe):
         
         
             
-    return [message, acted]
+    return [message, acted, last_turn]
         
 def changeHealth(username, amount):
     db = get_db()

@@ -13,26 +13,36 @@ import time, click
 
 bp = Blueprint('blog', __name__)
 
+def giveOutActions():
+    thisMany =  (int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points']))
+
+    if (currentTurnUser()['action_points'] == 0) and checkTurn() == int(currentTurnUser()['id']):
+        click.echo("gave "+str(currentTurnUser()['username'])+" "+str(thisMany)+" action points")
+        giveActionPoints(currentTurnUser()['username'], thisMany)
+        
+
+        for q in getAllFollowers(currentTurnUser()['username']):
+            giveActionPoints(q['username'],(int(q['max_action_points'])-int(q['action_points'])))
+
+
+
+
 @bp.route('/')
 def index():
 
 
     if currentTurnUser():
 
-        thisMany =  (int(currentTurnUser()['max_action_points'])-int(currentTurnUser()['action_points']))
-
-        if (currentTurnUser()['action_points'] == 0) and checkTurn() == int(currentTurnUser()['id']):
-            click.echo("gave "+str(currentTurnUser()['username'])+" "+str(thisMany)+" action points")
-            giveActionPoints(currentTurnUser()['username'], thisMany)
-            
-
-            for q in getAllFollowers(currentTurnUser()['username']):
-                giveActionPoints(q['username'],(int(q['max_action_points'])-int(q['action_points'])))
+        giveOutActions()
 
         if (currentTurnUser()['kind'] != 'player'):
             if currentTurnUser()['kind'] == 'hostile':
                 
                 hostileTurn(currentTurnUser())
+                giveOutActions()
+
+
+                
 
 
 
@@ -138,7 +148,8 @@ def act():
             if action_message[1] == False:
                 flash("You "+action_message[0])
                 return redirect(url_for('blog.act'))
-            
+            if action_message[2] == True:
+                return redirect(url_for('blog.index'))
 
 
 

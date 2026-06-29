@@ -127,6 +127,16 @@ def load_logged_in_user():
                 if q != g.user:
                     g.neighborsVisible.append(q)
 
+            g.structures = []
+            grabber = get_db().execute(
+                'SELECT * FROM structure WHERE posX = ? AND posY = ?', (g.user['posX'], g.user['posY'])
+                    
+                ).fetchall()
+            
+            for q in grabber:
+                if q != g.user:
+                    g.structures.append(q)
+
             g.followers = []
             taker = get_db().execute(
                 'SELECT * FROM user WHERE kind = ?', ("follower "+g.user['username'],)
@@ -142,6 +152,10 @@ def load_logged_in_user():
                 ).fetchone()
             
             g.link = 'backgrounds/'+str(g.location['full_name'])+'.png'
+            
+            g.structureLinks = []
+            for q in g.structures:
+                g.structureLinks.append('structures/'+str(q['full_name'])+'.png')
             
             g.clothesLinks = []
 

@@ -24,10 +24,11 @@ class structure:
  
 
 front_porch = structure("Porch","None","room",1,1,4,1,50,50)
+campfire = structure("Campfire","None","room",1,1,4,1,50,50)
 
 
 
-starting_structures = [front_porch]
+starting_structures = [front_porch, campfire]
 
 
 

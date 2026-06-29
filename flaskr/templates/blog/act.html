@@ -55,8 +55,16 @@
         <br>
         <div class="player">
             <h2>{{ g.location['full_name'] }}</h2>
-            <img src="{{ url_for('static', filename= g.link ) }}" />
+            <div class="picsparent">
+                <img class="body" src="{{ url_for('static', filename= g.link ) }}" />
+
+                {% if g.structureLinks%}
+                    {% for q in g.structureLinks %}
+                        <img class="bodyclothe" src="{{ url_for('static', filename= q ) }}" style="position: absolute; translate: 62% 0%"/>
+                    {% endfor %}
+                {% endif %}
             
+            </div>
             <div></div>
             {% if g.ground %}
                 <div>On the ground you see a 
