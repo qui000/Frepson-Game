@@ -207,6 +207,7 @@ def takeAction(full_name,whom,describe):
                 acted = True
                 if getUserHealth(object) <= 0:
                     message = ("punched and killed "+object+". A heart's screen is it's hands it seems.")
+                    flash(currentUsername+" killed "+object)
                     dropInventory(object)
                     killUser(object)
                 else:
@@ -222,6 +223,7 @@ def takeAction(full_name,whom,describe):
                 acted = True
                 if getUserHealth(object) <= 0:
                     message = ("stabbed and killed "+object+". A heart's screen is it's hands it seems.")
+                    flash(currentUsername+" killed "+object)
                     killUser(object)
                     dropInventory(object)
                 else:
