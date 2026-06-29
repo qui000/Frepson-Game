@@ -71,8 +71,8 @@ def createStartingStructures():
     for q in starting_structures:
         db = get_db()
         db.execute(
-            "INSERT INTO structure (full_name, action, type, ownerID, level, posX, posY, health, max_health) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (q.full_name, q.action, q.type, q.ownerID, q.level, q.posX, q.posY, q.health, q.max_health),
+            "INSERT INTO structure (full_name, action, type, ownerID, level, posX, posY, health, max_health, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (q.full_name, q.action, q.type, q.ownerID, q.level, q.posX, q.posY, q.health, q.max_health, q.size),
         )
         db.commit()
     return

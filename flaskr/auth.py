@@ -162,6 +162,9 @@ def load_logged_in_user():
             for q in g.inventory:
                 if q['armorType'] != 'None':
                     g.clothesLinks.append('players/'+str(q['full_name'])+'.png')
+            if int(g.user['health']) < 10:
+                g.clothesLinks.append('players/bruise.png')
+
                     
 
 
