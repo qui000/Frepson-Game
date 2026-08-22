@@ -1,5 +1,5 @@
 import functools
-
+import click
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
@@ -129,7 +129,7 @@ def load_logged_in_user():
 
             g.structures = []
             grabber = get_db().execute(
-                'SELECT * FROM structure WHERE posX = ? AND posY = ?', (g.user['posX'], g.user['posY'])
+                'SELECT * FROM structure WHERE posX = ? AND posY = ? ORDER BY type ASC', (g.user['posX'], g.user['posY'])
                     
                 ).fetchall()
             
@@ -154,16 +154,32 @@ def load_logged_in_user():
             g.link = 'backgrounds/'+str(g.location['full_name'])+'.png'
             
             g.structureLinks = []
+            prev = ""
+            count = 1
             for q in g.structures:
-                g.structureLinks.append('structures/'+str(q['full_name'])+'.png')
+                if prev == q['type']:
+                    count = count + 1
+                else:
+                    count = 1
+                    prev = q['type']
+
+                g.structureLinks.append('structures/'+str(q['type'])+'/'+str(count)+'.png')
+                click.echo('structures/'+str(q['type'])+str(count)+'.png')
             
             g.clothesLinks = []
 
             for q in g.inventory:
                 if q['armorType'] != 'None':
-                    g.clothesLinks.append('players/'+str(q['full_name'])+'.png')
+                    g.clothesLinks.append('player/'+str(q['full_name'])+'.png')
             if int(g.user['health']) < 10:
-                g.clothesLinks.append('players/bruise.png')
+                g.clothesLinks.append('player/bruise.png')
+
+
+            g.neighborHats = []
+            getter = get_db().execute(
+                'SELECT * FROM item WHERE ownerID = ? AND onGround = 0 AND armorType = ?', (g.user['id'], "helmet")
+                    
+                ).fetchall()
 
                     
 

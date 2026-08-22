@@ -17,7 +17,7 @@
             <div class="sidenav">
                 <h2>{{g.user['username']}}</h2>
                 <div class="picsparent">
-                    <img class="body" src="{{ url_for('static', filename='players/body.png' ) }}" />
+                    <img class="body" src="{{ url_for('static', filename='player/body.png' ) }}" />
                     {% if g.clothesLinks %}
                         {% for q in g.clothesLinks %}
                             <img class="bodyclothe" src="{{ url_for('static', filename= q ) }}" style="position: absolute; translate: 0% 0%"  />
@@ -78,16 +78,25 @@
             {% endif %}
             
             {% if g.neighborsVisible %}
-                <div>You also see 
+                <div>You also see<br> 
                         {% for q in g.neighborsVisible %}
-                            {{ q['username'] }} 
-                            {% if q['mood'] != 'normal' %}
-                                looking all {{q['mood']}}
-                            {% endif%},
+                            <div class="picsparent">
+                                
+                                <img class="body" src="{{ url_for('static', filename= q['kind']+'/headshot.png' ) }}" />
+                                <div style="position: absolute; top: 25%; left: 40%;">{{ q['username'] }}</div>
+                                {% if g.structureLinks%}
+                                    {% for q in g.structureLinks %}
+                                        
+                                    {% endfor %}
+                                {% endif %}
+                            
+                            </div>
                         
+
+                
                         {% endfor %}
 
-                        just a bit too close.
+                        <br>just a bit too close.
                     
                     
                     
