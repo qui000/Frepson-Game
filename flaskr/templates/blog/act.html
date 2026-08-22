@@ -113,6 +113,16 @@
         <input type="submit" value="Act">
     </form>
 
+    <div><strong>Recent Actions</strong></div>
+
+    {% for act in acts %}
+        <div class="post">
+        <div class="about"><b>{{ act['created'].strftime('%Y-%m-%d') }}: {{ act['username'] }} has {{ act['turn_action'] }}</b></div>
+        <div class="body"> {{ act['turn_description'] }}</div>
+        </div>
+
+
+    {% endfor %}
     
 
 

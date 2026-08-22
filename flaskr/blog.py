@@ -6,7 +6,7 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 from flaskr.actions import takeAction, giveAllActions, hostileTurn
-from flaskr.turns import giveActionPoints, checkTurn, currentTurnUser
+from flaskr.turns import giveActionPoints, checkTurn, currentTurnUser, highestID
 from flaskr.followers import getAllFollowers
 
 import time, click
@@ -125,6 +125,17 @@ def create():
 @login_required
 def act():
 
+    farBack = int(5*(highestID()+2))
+    click.echo(farBack)
+    db = get_db()
+    acts = db.execute(
+            ' SELECT a.id, turn_action, turn_description, created, author_id, username'
+            ' FROM act a JOIN user u ON a.author_id = u.id'
+            ' ORDER BY created DESC'
+            ' LIMIT ?',
+            (farBack,)
+        ).fetchall()
+    db.commit()
 
 
         
@@ -157,7 +168,7 @@ def act():
             
             return redirect(url_for('blog.act'))
 
-    return render_template('blog/act.html',allActs = giveAllActions(g.user))
+    return render_template('blog/act.html',allActs = giveAllActions(g.user), acts = acts)
 
 
 def get_post(id, check_author=True):
