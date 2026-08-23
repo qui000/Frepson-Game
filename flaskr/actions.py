@@ -22,7 +22,12 @@ def giveAllActions(who):
         case "sitting":
             base_actions.remove("move")
             base_actions.append("rise")
-        
+
+    if allSameLocation(who) != None:
+        for q in allSameLocation(who):
+            if q['kind'] == 'staticNPC':
+                base_actions.append('address')
+
     
     if getInventory(who,'both'):
 
@@ -44,6 +49,8 @@ def giveAllActions(who):
 
     if placeAction != "None":
             base_actions.append(placeAction)
+
+
     return base_actions
             
 
@@ -270,6 +277,12 @@ def takeAction(full_name,whom,describe):
                 giveActionPoints(currentUsername,-1)
                 acted = True
 
+        if action == "address":
+            if sameCurrentLocation(currentUsername, object) == True:
+                message = "addressed "+object
+                giveActionPoints(currentUsername,-1)
+                acted = True
+                npcReact(getUser(object))
 
     
     if len(subjects) == 2:
@@ -534,5 +547,6 @@ def hostileTurn(hostile):
 
     return action_message
 
-
+def npcReact(who):
+    click.echo("OK")
 

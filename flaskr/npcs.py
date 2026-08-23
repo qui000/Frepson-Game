@@ -34,15 +34,20 @@ puppy = NPC('puppy',2,2,1,"")
 triceratops = NPC('triceratops',400,400,10,"patron",10,10,1,1,0,"normal",4,1)
 
 
+#Static NPCS
+
+moldy = NPC('moldy',20,20,6,"staticNPC",0,0,1,1,0,"normal",1,1)
+
+
 
 all_NPCs = [dalmation]
-staticNPCs = []
+staticNPCs = [moldy]
 activeNPCs = []
 followers = [dalmation]
 dinos = [triceratops]
 dinosons = []
 
-startingNPCs = [triceratops]
+startingNPCs = [triceratops, moldy]
 
 def getAllNPCs():
    
