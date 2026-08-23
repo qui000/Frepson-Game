@@ -164,7 +164,6 @@ def takeAction(full_name,whom,describe):
                 message = "cannot go that way"
                 if checkLocaleMove(1,'posY',whom) == True:
                     changeLocale(1,'posY',currentUsername)
-                    giveActionPoints(currentUsername,-1)
                     message = "went North"
                     acted = True
 
@@ -174,7 +173,6 @@ def takeAction(full_name,whom,describe):
                 message = "cannot go that way"
                 if checkLocaleMove(-1,'posY',whom) == True:
                     changeLocale(-1,'posY',currentUsername)
-                    giveActionPoints(currentUsername,-1)
                     message = "went South"
                     acted = True
             
@@ -184,7 +182,6 @@ def takeAction(full_name,whom,describe):
                 message = "cannot go that way"
                 if checkLocaleMove(1,'posX',whom) == True:
                     changeLocale(1,'posX',currentUsername)
-                    giveActionPoints(currentUsername,-1)
                     message = "went East"
                     acted = True
 
@@ -194,15 +191,17 @@ def takeAction(full_name,whom,describe):
                 message = "cannot go that way"
                 if checkLocaleMove(-1,'posX',whom) == True:
                     changeLocale(-1,'posX',currentUsername)
-                    giveActionPoints(currentUsername,-1)
                     message = "went West"
                     acted = True
             
-            if acted == True and getAllFollowers(currentUsername) != None:
-                for q in getAllFollowers(currentUsername):
+            if acted == True:
+                if getAllFollowers(currentUsername) != None:
+                    for q in getAllFollowers(currentUsername):
 
-                    takeAction(full_name, q, "Coordinated action is the new joy, so they say.")
-                
+                        takeAction(full_name, q, "Coordinated action is the new joy, so they say.")
+                if describe != "Coordinated action is the new joy, so they say.":
+                    giveActionPoints(currentUsername,-1)
+
                 
 
         if action == "punch":
