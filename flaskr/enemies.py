@@ -33,11 +33,24 @@ def getAllEnemies():
    return all_enemies
 def spawnEnemy(which, where):
 
+    # Checks for same username and then appends ascending number until a match isn't found
+    qx = 1
+    newUsername = which.username
+    while qx != 0:
+        checking = get_db().execute(
+            'SELECT * FROM user WHERE username = ?', (newUsername,)
+            ).fetchone()
+        if checking != None:
+           newUsername = which.username + str(qx)
+           qx = qx + 1
+        else:
+           qx = 0
 
+    
     db = get_db()
     db.execute(
         "INSERT INTO user (username, password, kind, mood, posX, posY) VALUES (?, ?, ?, ?, ?, ?)",
-        (which.username, '123', 'hostile', which.mood, where['posX'], where['posY']),
+        (newUsername, '123', 'hostile', which.mood, where['posX'], where['posY']),
     )
     db.commit()
 

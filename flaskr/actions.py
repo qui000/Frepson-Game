@@ -45,7 +45,7 @@ def giveAllActions(who):
 
 
 
-    placeAction = getLocale(getUserLocationID(who))['action']
+    placeAction = getLocale(getUserLocation(who)['id'])['action']
 
     if placeAction != "None":
             base_actions.append(placeAction)
@@ -103,6 +103,8 @@ def targetUsernames(who):
     return targets
     
 # Returns (Action Message, Success, Last Turn?)
+
+# ***YOU CAN'T USE WHOM FOR ANYTHING UPDATED WITHIN THIS FUNC***
 def takeAction(full_name,whom,describe):
     
     message = "fooled around."
@@ -201,6 +203,7 @@ def takeAction(full_name,whom,describe):
                         takeAction(full_name, q, "Coordinated action is the new joy, so they say.")
                 if describe != "Coordinated action is the new joy, so they say.":
                     giveActionPoints(currentUsername,-1)
+                    prepLocation(whom, getUserLocation(getUser(currentUsername)))
 
                 
 
@@ -244,7 +247,7 @@ def takeAction(full_name,whom,describe):
             item = getItem(object)
             
             if item['armorType'] == 'None':
-                if (str(itemPlace[0]) == str(getUserLocationID(whom))) and (itemPlace[1] == 1):
+                if (str(itemPlace[0]) == str(getUserLocation(whom)['id'])) and (itemPlace[1] == 1):
                     message = "didn't have room on his person for the "+object
               
                     if  whom['room'] > len(getInventory(whom,'inventory')):
@@ -256,7 +259,7 @@ def takeAction(full_name,whom,describe):
                 message = "equipped the "+object
                 for q in getInventory(whom, 'armor'):
                     if q['armorType'] == item['armorType']:
-                        putItem(q['full_name'], 'location', getUserLocationID(whom))
+                        putItem(q['full_name'], 'location', getUserLocation(whom)['id'])
                         message = message+" and dropped the "+q['full_name']
 
                 putItem(object, 'user', currentUsername)
@@ -272,7 +275,7 @@ def takeAction(full_name,whom,describe):
             if (str(item[0]) == str(whom['id'])) and (item[1] == 0):
                 message = "dropped the "+object
                 
-                putItem(object, 'location', getUserLocationID(whom))
+                putItem(object, 'location', getUserLocation(whom)['id'])
                 giveActionPoints(currentUsername,-1)
                 acted = True
 
@@ -303,7 +306,7 @@ def takeAction(full_name,whom,describe):
                 message = "gave the "+subjects[1]+" to "+reciever['username']+" and he equipped it"
                 for q in getInventory(reciever, 'armor'):
                     if q['armorType'] == item['armorType']:
-                        putItem(q['full_name'], 'location', getUserLocationID(reciever))
+                        putItem(q['full_name'], 'location', getUserLocation(reciever)['id'])
                         message = message+" and dropped the "+q['full_name']
 
                 putItem(subjects[1], 'user', reciever['username'])
@@ -453,14 +456,14 @@ def getInventory(who, armor):
     
     return inventory
 
-def getUserLocationID(who):
+def getUserLocation(who):
 
     location = get_db().execute(
     'SELECT * FROM location WHERE posX = ? AND posY = ?', (who['posX'],who['posY'])
         
     ).fetchone()
 
-    return location['id']
+    return location
 
 def getUserHealth(username):
 
@@ -479,7 +482,7 @@ def dropInventory(username):
     ).fetchone()
 
     for q in getInventory(who,'both'):
-        putItem(q['full_name'],'location',getUserLocationID(who))
+        putItem(q['full_name'],'location',getUserLocation(who)['id'])
 
 def getUser(username):
     location = get_db().execute(
@@ -549,3 +552,10 @@ def hostileTurn(hostile):
 def npcReact(who):
     click.echo("OK")
 
+def prepLocation(who, where):
+    number = random.randint(1,10)
+    match where['type']:
+
+        case 'field':
+            if number >= 5:
+                spawnEnemy(getAllEnemies()[0], where)
