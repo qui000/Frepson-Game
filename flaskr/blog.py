@@ -40,6 +40,8 @@ def index():
                 
                 hostileTurn(currentTurnUser())
                 giveOutActions()
+                return redirect(url_for('blog.index'))
+
 
 
                 
@@ -137,7 +139,7 @@ def act():
         ).fetchall()
     db.commit()
 
-
+    
         
 
     if request.method == 'POST':

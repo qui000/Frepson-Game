@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import get_db
 from flaskr.turns import checkTurn
-
+from flaskr.actions import giveAllActions, getInventory
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -138,6 +138,8 @@ def load_logged_in_user():
                     g.structures.append(q)
 
             g.followers = []
+            g.followersActions = []
+            g.followersInventorys = []
             taker = get_db().execute(
                 'SELECT * FROM user WHERE kind = ?', ("follower "+g.user['username'],)
                     
@@ -146,6 +148,8 @@ def load_logged_in_user():
             for q in taker:
                 if q != g.user:
                     g.followers.append(q)
+                    g.followersActions.append(giveAllActions(q))
+                    g.followersInventorys.append(getInventory(q, 'both'))
 
             g.turnUser = get_db().execute(
                 'SELECT * FROM user WHERE id = ?', (checkTurn(),)

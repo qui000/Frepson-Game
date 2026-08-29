@@ -30,21 +30,69 @@
             <div class="sidenavR">
                 <div><h2>Inventory:</h2>
                         {% for q in g.inventory %}
-                            {{ q['full_name'] }}, 
+                            
+                            {% if not loop.last %}
+                                {{ q['full_name'] }},
+                            {% else %}
+                                {{ q['full_name'] }}
+                            {% endif %}
                         {% endfor %}
                 </div>
                 <br>
                 <div><h2>Actions:</h2>
                 {% for act in allActs %}
-                    {{ act }}, 
+                    {% if not loop.last %}
+                        {{ act }},
+                    {% else %}
+                        {{ act }}
+                    {% endif %}
+                     
+                    
                 {% endfor %}
                 </div>
                 <h2>Followers:</h2>
                 {%if g.followers %}
                     {% for follower in g.followers %}
+                        {% set outer_loop = loop %}
                         <h3>{{ follower['username'] }}</h3>
                         <div>Action Points: {{ follower['action_points'] }}/{{ follower['max_action_points'] }}</div>
-                        
+                        {% if g.followersActions %}
+                            <br>
+                            <div>Actions:</div>
+                            {% for actions in g.followersActions %}
+                                {% if loop.index == outer_loop.index %}
+                                    <div>
+                                        {% for action in actions %}
+                                            {% if not loop.last %}
+                                                {{ action }},
+                                            {% else %}
+                                                {{ action }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if g.followersInventorys %}
+                            <br>
+                            <div>Inventory:</div>
+                            {% for inventorys in g.followersInventorys %}
+                                {% if loop.index == outer_loop.index %}
+                                    <div>
+                                        {% for inventory in inventorys %}
+                                            {% if not loop.last %}
+                                                {{ inventory.full_name }},
+                                            {% else %}
+                                                {{ inventory.full_name }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                                    
+                    
 
                     {% endfor %}
                 {% endif %}
@@ -69,7 +117,11 @@
             {% if g.ground %}
                 <div>On the ground you see a 
                         {% for q in g.ground %}
-                            {{ q['full_name'] }}, 
+                            {% if not loop.last %}
+                                {{ q['full_name'] }},
+                            {% else %}
+                                {{ q['full_name'] }}
+                            {% endif %} 
                         {% endfor %}
                     
                     
